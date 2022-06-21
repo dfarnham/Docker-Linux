@@ -210,11 +210,14 @@ $ docker commit 0ddcfe629c2f ubu-test
 sha256:653b03d1edbd3fae69aeb0197ec5000f61e414e95e054f4c4173473a84ec394f
 
 ... [many changes later] ...
+
 Write the entire image to a file, load on another machine (similar architecture)
 
 Find the image id ( docker images )
 1. docker save 0177ce6d2533 > 0177ce6d2533.tar
 2. scp 0177ce6d2533.tar some_machine:
+
+Load a saved image
 3. docker load < 0177ce6d2533.tar
 ~~~
 
