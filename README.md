@@ -142,7 +142,7 @@ ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLe
 **Persisting** changes made to a **running** container using **docker commit container_id tag**
 
 (from shell 1, no containers running)
--------------------------------------
+----
 ~~~sh
 from shell 1, no containers running)
 ------------------------------------
@@ -165,7 +165,7 @@ root@0ddcfe629c2f:~#
 ---
 
 (from shell 2, connect - display sudo privs -- write a file)
---------------
+----
 ~~~sh
 from shell 2, connect - display sudo privs -- write a file
 ----------------------------------------------------------
@@ -193,7 +193,7 @@ User dave may run the following commands on 0ddcfe629c2f:
 ---
 
 (from shell 3, view data in the running container - commit changes)
---------------
+----
 ~~~sh
 from shell 3, view data in the running container - commit changes
 -----------------------------------------------------------------
