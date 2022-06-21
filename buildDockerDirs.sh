@@ -13,8 +13,8 @@ timestamp=`date +.%Y%m%d_%H%M%S`
 OPENSUSE_LEAP='opensuse/leap'
 OPENSUSE_DEFAULT_TAG=`echo "$OPENSUSE_LEAP" | sed 's,[/:].*,,'`
 
-REDHAT_UBI8='redhat/ubi8'
-REDHAT_DEFAULT_TAG=`echo "$REDHAT_UBI8" | sed 's,[/:].*,,'`
+REDHAT_UBI9='redhat/ubi9'
+REDHAT_DEFAULT_TAG=`echo "$REDHAT_UBI9" | sed 's,[/:].*,,'`
 
 UBUNTU_KINETIC='ubuntu:kinetic'
 UBUNTU_DEFAULT_TAG=`echo "$UBUNTU_KINETIC" | sed 's,[/:].*,,'`
@@ -28,7 +28,7 @@ cat >&2 << EOF
 Usage: `basename $0` [OPTIONS] -d distribution
     -d  distribution        # distribution to build
           opensuse - $OPENSUSE_LEAP
-          redhat   - $REDHAT_UBI8
+          redhat   - $REDHAT_UBI9
           ubuntu   - $UBUNTU_KINETIC
 Options:
     -u  user                # (default derived from the shell)
@@ -85,7 +85,7 @@ do
                     docker_image=$OPENSUSE_LEAP
                     ;;
                 redhat)
-                    docker_image=$REDHAT_UBI8
+                    docker_image=$REDHAT_UBI9
                     ;;
                 ubuntu)
                     docker_image=$UBUNTU_KINETIC
@@ -167,26 +167,26 @@ mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_
 #
 # installing a set of workable packages I desire for each distribution and
 # maintaining custom utility portability across architectures is fluid
-shared_pkg_names='curl gcc git jq less make man net-tools perl rsync sudo vim'
+shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
 
 if [ $docker_image = $OPENSUSE_LEAP ]; then
     SUDO_GROUP=wheel
-    PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
+    PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
-elif [ $docker_image = $REDHAT_UBI8 ]; then
+elif [ $docker_image = $REDHAT_UBI9 ]; then
     SUDO_GROUP=wheel
-    PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server perl-encoding procps python39"
+    PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
 elif [ $docker_image = $UBUNTU_KINETIC ]; then
     SUDO_GROUP=sudo
-    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
+    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
     FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
     HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
 else
     echo "Bug! Docker image not matched: [$docker_image]"
-    echo "Bug! Distrubtions: [$OPENSUSE_LEAP] [$REDHAT_UBI8] [$UBUNTU_KINETIC]"
+    echo "Bug! Distrubtions: [$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC]"
     exit 1
 fi
 

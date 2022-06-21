@@ -84,7 +84,7 @@ press enter to "docker build -t ubuntu ubuntu-kinetic" or ctrl-c to quit and ins
 Usage: buildDockerDirs.sh [OPTIONS] -d distribution
     -d  distribution        # distribution to build
           opensuse - opensuse/leap
-          redhat   - redhat/ubi8
+          redhat   - redhat/ubi9
           ubuntu   - ubuntu:kinetic
 Options:
     -u  user                # (default derived from the shell)
