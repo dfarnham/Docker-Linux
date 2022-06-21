@@ -165,6 +165,8 @@ root@0ddcfe629c2f:~#
 (from shell 2, connect - display sudo privs -- write a file)
 --------------
 ~~~sh
+from shell 2, connect - display sudo privs -- write a file
+----------------------------------------------------------
 $ docker ps -l   # or  container ls
 CONTAINER ID   IMAGE      COMMAND                  CREATED              STATUS              PORTS                  NAMES
 0ddcfe629c2f   ubu-test   "/bin/sh -c '/usr/sb…"   About a minute ago   Up About a minute   0.0.0.0:2222->22/tcp   jovial_cray
@@ -191,6 +193,8 @@ User dave may run the following commands on 0ddcfe629c2f:
 (from shell 3, view data in the running container - commit changes)
 --------------
 ~~~sh
+from shell 3, view data in the running container - commit changes
+-----------------------------------------------------------------
 $ ssh -p 2222 dave@localhost cat keepme  # show it's in the running container
 persisted data
 
