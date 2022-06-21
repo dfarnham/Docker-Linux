@@ -22,6 +22,8 @@ setupDockerDirs.sh -d redhat
 setupDockerDirs.sh -d ubuntu
 ~~~
 
+---
+
 The **user_common** directory contains files and utilities which will be copied to the user account
 
 ~~~sh
