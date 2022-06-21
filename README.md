@@ -15,13 +15,13 @@ Features:
 
 ---
 
-To create the Docker build directories run **setupDockerDirs.sh**:
+To create the Docker build directories run **buildDockerDirs.sh**:
 
 ~~~sh
 # create the build directory for each distribution with defaults
-setupDockerDirs.sh -d opensuse
-setupDockerDirs.sh -d redhat
-setupDockerDirs.sh -d ubuntu
+buildDockerDirs.sh -d opensuse
+buildDockerDirs.sh -d redhat
+buildDockerDirs.sh -d ubuntu
 ~~~
 
 ---
@@ -71,17 +71,17 @@ user_home/
 The **-x** option will prompt to issue the **docker build** command
 
 ~~~sh
-setupDockerDirs.sh -x -d ubuntu
+buildDockerDirs.sh -x -d ubuntu
 ...
 press enter to "docker build -t ubuntu ubuntu-kinetic" or ctrl-c to quit and inspect ubuntu-kinetic/Dockerfile
 ~~~
 
 ---
 
-**setupDockerDirs.sh** has a few configurable options
+**buildDockerDirs.sh** has a few configurable options
 
 ~~~sh
-Usage: setupDockerDirs.sh [OPTIONS] -d distribution
+Usage: buildDockerDirs.sh [OPTIONS] -d distribution
     -d  distribution        # distribution to build
           opensuse - opensuse/leap
           redhat   - redhat/ubi8
@@ -105,7 +105,7 @@ Options:
 A configured build example:
 
 ~~~sh
-setupDockerDirs.sh -x -d ubuntu \
+buildDockerDirs.sh -x -d ubuntu \
 	-u dave \
 	-p `openssl passwd -6 testing` \
 	-t ubu-test \
@@ -210,14 +210,11 @@ $ docker commit 0ddcfe629c2f ubu-test
 sha256:653b03d1edbd3fae69aeb0197ec5000f61e414e95e054f4c4173473a84ec394f
 
 ... [many changes later] ...
-
 Write the entire image to a file, load on another machine (similar architecture)
 
 Find the image id ( docker images )
 1. docker save 0177ce6d2533 > 0177ce6d2533.tar
 2. scp 0177ce6d2533.tar some_machine:
-
-Load a saved image
 3. docker load < 0177ce6d2533.tar
 ~~~
 

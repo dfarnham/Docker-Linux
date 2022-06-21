@@ -57,7 +57,7 @@ if [ "$color_prompt" = yes ]; then
     # light green username,
     # light red symbol @,
     # light cyan servername,
-    # white :,
+    # yellow :,
     # pink current dir,
     # '#' if root or '$' if user,
     # white >

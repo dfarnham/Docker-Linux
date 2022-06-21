@@ -167,21 +167,21 @@ mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_
 #
 # installing a set of workable packages I desire for each distribution and
 # maintaining custom utility portability across architectures is fluid
-shared_pkg_names='curl gcc git jq less make man perl rsync sudo vim'
+shared_pkg_names='curl gcc git jq less make man net-tools perl rsync sudo vim'
 
 if [ $docker_image = $OPENSUSE_LEAP ]; then
     SUDO_GROUP=wheel
-    PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
+    PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
 elif [ $docker_image = $REDHAT_UBI8 ]; then
     SUDO_GROUP=wheel
-    PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en man-db openssh-clients openssh-server perl-encoding procps python39"
+    PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server perl-encoding procps python39"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
 elif [ $docker_image = $UBUNTU_KINETIC ]; then
     SUDO_GROUP=sudo
-    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names man-db openssh-client openssh-server man-db perl python3 r-base tree"
+    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
     FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
     HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
 else
