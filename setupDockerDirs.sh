@@ -226,7 +226,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # to run the container exposing a shared directory and mapping localhost port 2222 to 22
 # mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME
 
-# to connect to the running container as admin $USER"
+# to connect to the running container as admin $USER
 # ssh -p 2222 $USER@localhost
 # ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost
 
@@ -312,7 +312,7 @@ if [ $? -eq 0 ]; then
     echo "# to run the container exposing a shared directory and mapping localhost port 2222 to 22"
     echo "${g}mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}"
     echo
-    echo "# to connect to the running container as the admin USER"
+    echo "# to connect to the running container as admin $USER"
     echo "${g}ssh -p 2222 $USER@localhost${rt}"
     echo "     or"
     echo "${g}ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost${rt}"
