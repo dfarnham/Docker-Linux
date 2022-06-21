@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 substring"
+    exit 1
+fi
+
+find . -iname \*"$@"\* -print 2>/dev/null

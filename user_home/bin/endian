@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set `echo abcd | od -t xS | sed q`
+
+if [ "$*" = "0000000 6162 6364 0a00" ]; then
+    echo "Big Endian"
+elif [ "$*" = "0000000 6261 6463 000a" ]; then
+    echo "Little Endian"
+else
+    echo "Can't dertermine endianess"
+fi

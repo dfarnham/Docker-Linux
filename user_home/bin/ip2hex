@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+foreach $ip (@ARGV) {
+    #($hex = unpack("H*", pack("CCCC", split(/\./, $ip)))) =~ tr/a-z/A-Z/;
+    #print "$hex\n";
+    print unpack("H*", pack("CCCC", split(/\./, $ip))), "\n";
+}

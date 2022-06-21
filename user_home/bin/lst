@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]; then
+	dir=`pwd`
+else
+	dir=$1
+fi
+
+# find "$dir" -follow -type d -print | sort -f | \
+echo $dir
+find "$dir" -follow -type d -print | sort -f | \
+sed -e "s,^${dir},," -e 1d -e 's,[^/]*/\([^/]*\)$, `---->\1,' -e 's,[^/]*/, |     ,g'

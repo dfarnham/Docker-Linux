@@ -1,0 +1,1 @@
+perl -MText::Tabs -pe '$tabstop=4; s,\s+$,,; $l=expand($_); s,.*,$l\n,'

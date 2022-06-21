@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+#
+# Text::Tabs::expand() or Text::Tabs::unexpand()
+#
+# dwf
+#   Sat Nov 25 10:59:16 MST 2000 -- initial
+#   Thu Dec 19 09:43:44 MST 2002 -- trimmed trailing whitespace
+
+use strict;
+use Text::Tabs;
+use open qw/:std :encoding(UTF-8)/;
+use feature 'unicode_strings';
+
+my $bname = substr($0, rindex($0, "/") + 1);
+die "invoke as '[un]exp'\n" unless $bname =~ /^(?:un)?exp$/;
+
+$ARGV[0] =~ /^-(\d+)$/ && ($tabstop = $1) && shift;
+
+eval "while (<>) {
+          s/\\s+\$//;
+          print ${bname}and(\$_), \"\n\";
+      }";

@@ -1,0 +1,114 @@
+#!/bin/sh
+# @(#)chop 5.0 92/01/13 Maarten Litmaath <maart@nikhef.nl>
+# split (binary) files into pieces
+
+base=x
+chunk=10k
+fmt=%03d
+temp='chop$$.tmp'
+verbose=
+
+usage='
+cat >&2 << EOF
+Usage: `basename $0` [options] [files]
+Options [defaults]:
+-b base  : base of output names [$base]
+-c chunk : maximum output file size [$chunk] - see dd(1) for syntax
+-f fmt   : awk(1) printf() format of output name numeric extension [$fmt]
+-t temp  : temporary file template to use [$temp]
+-v       : list output files
+--       : end options
+A filename "-" denotes standard input, used by default.
+EOF
+	exit 1
+'
+
+while :
+do
+	case $1 in
+	--)
+		shift
+		break
+		;;
+	-b)
+		shift
+		base=$1
+		;;
+	-c)
+		shift
+		chunk=$1
+		;;
+	-f)
+		shift
+		fmt=$1
+		;;
+	-t)
+		shift
+		temp=$1
+		;;
+	-v)
+		verbose=1
+		;;
+	-suey)
+		cat << \EndOfDish
+chop su.ey \cha:p-'su:-e-\ n [Chin (Cant) shap sui odds and ends, fr. shap
+   miscellaneous + sui bits] : a dish prepared chiefly from bean sprouts,
+   bamboo shoots, water chestnuts, onions, mushrooms, and meat or fish and
+   served with rice and soy sauce
+EndOfDish
+		exit 0
+		;;
+	-stick)
+		cat << \EndOfWood
+chop.stick \'cha:p-.stik\ n [pidgin E, fr. chop fast (of Chinese origin;
+   akin to Cant kap) + E stick] : one of a pair of slender sticks held between
+   thumb and fingers and used chiefly in oriental countries to lift food to
+   the mouth
+EndOfWood
+		exit 0
+		;;
+	-)
+		break
+		;;
+	-*)
+		eval "$usage"
+		;;
+	*)
+		break
+	esac
+	shift
+done
+
+eval tmpfile="$temp"
+exec 3<&0	# remember original stdin
+
+awk "END { while (1) printf \"$fmt\\n\", ++i }" < /dev/null | (
+	read i || exit 1
+
+	for file in "${@--}"
+	do
+		case $file in
+		-)
+			exec 4<&3
+			bs="ibs=$chunk obs=$chunk"
+			;;
+		*)
+			exec 4< $file
+			bs=bs=$chunk
+		esac
+
+		while :
+		do
+			dd $bs count=1 <&4 2>&1 > $tmpfile |
+			egrep -v '^[01]\+[01] records (in|out)$' >&2 && exit 1
+			test -s "$tmpfile" || break
+			mv "$tmpfile" "$base$i" || exit 1
+			test $verbose && echo "$base$i"
+			read i || exit 1
+		done
+	done
+)
+
+status=$?
+rm -f "$tmpfile"
+exit $status

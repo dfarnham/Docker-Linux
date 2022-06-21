@@ -1,0 +1,38 @@
+#!/usr/bin/sed 1d
+Installing:
+	rpm -ivh foo-1.0-1.i386.rpm
+
+Uninstalling:
+	rpm -e foo
+
+Upgrading:
+	rpm -Uvh foo-1.0-1.i386.rpm
+
+Verifying:
+	To verify a package containing a particular file
+		rpm -Vf /bin/vi
+
+	To verify ALL installed packages
+		rpm -Va
+
+	To verify an installed package against an RPM package file
+		rpm -Vp foo-1.0-1.i386.rpm
+
+	To find what package a file was installed from
+		rpm -qf /bin/vi
+
+	To find what documentation came with a particular file
+		rpm -qdf /bin/vi
+
+	To find information about a particular package
+		rpm -qip foo-1.0-1.i386.rpm
+
+	To find out what files would get installed from a package
+		rpm -qlp foo-1.0-1.i386.rpm
+
+	To find out what files are currently installed from a package
+		rpm -ql foo-1.0-1.i386
+
+Extracting:
+	To extract using 'rpm2cpio'
+		rpm2cpio foo-1.0-1.i386.rpm | ( cd /tmp/foo ; cpio -ivumd )

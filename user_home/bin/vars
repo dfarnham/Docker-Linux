@@ -1,0 +1,425 @@
+#!/usr/bin/env perl
+#
+# Script to generate appropriate syntax for the creation of environment
+# variables under C-Shell or Bourne shell.
+#
+# dwf -- Initial
+#        Thu May 21 21:06:33 MDT 1998
+#
+# dwf -- Added flag 'e', -l option, subroutine expand(), moved
+#        all values into the %ENV hash
+#        Sat May 23 01:28:38 MDT 1998
+#
+# dwf -- Added use strict, and enhanced documentation
+#        Wed Mar 21 23:27:42 MST 2001
+#
+# dwf -- Added $ENV variable after path checking
+#        Thu May 15 13:18:25 MDT 2003
+#
+# dwf -- Added 's' flag.
+#        Wed May 19 13:56:39 MDT 2004
+#
+# dwf -- Removed duplicate dirs during 'p' processing
+#        Mon Mar  7 13:15:29 MST 2005
+#
+# dwf -- Rewrite, added 't' processing
+#        Wed Mar  9 20:58:47 MST 2005
+#
+# dwf -- Added backtick processing
+#        Tue Jul 26 20:14:21 MDT 2011
+########################################################################
+
+use strict;
+use Getopt::Long;
+use FileHandle;
+use open qw/:std :encoding(UTF-8)/;
+use feature 'unicode_strings';
+
+use constant VARS => "$ENV{HOME}/.vars";
+my $Version = '2.5';
+
+my ($bourneMode, $cshMode, $long, $help);
+GetOptions('bourne', \$bourneMode,
+           'cshell', \$cshMode,
+           'long',   \$long,
+           'help',   \$help) or &usage();
+
+usage() if ($help || ($bourneMode && $cshMode));
+$bourneMode = 1 unless $cshMode;
+
+my $fh = new FileHandle(VARS) or die "Can't read " . VARS;
+binmode $fh, ":encoding(UTF-8)";
+
+my ($nextline, $flags, $var, $value);
+my (@exportVars, @localVars, @exports);
+my %TENV;
+while (my $line = $fh->getline()) {
+    next if $line =~ /^#/;    # skip comment lines
+    next if $line =~ /^\s*$/; # skip blank lines
+    $line =~ s/\s+$//;        # remove trailing whitespace
+
+    #
+    # Check for a continuation lines (lines ending with backslash(\)
+    #
+    while ($line =~ /\\$/) {
+        chop ($line);
+        # trim beginning/trailing whitespace
+        ($nextline = $fh->getline()) =~ s/^[\p{Space}\p{Z}]+|[\p{Space}\p{Z}]+$//g;
+        $line .= $nextline;
+    }
+
+    #
+    # Get the processing flags, variables, and values
+    #
+    ($flags, $var, $value) = $line =~ /^([bcteps]{1,6})\s+(\w+)\s+(.*)/;
+    unless ($flags && $var && $value) {
+        warn "Can't parse line, skipping: $line\n";
+        next;
+    }
+    next unless (($flags =~ /t/) || ($bourneMode && $flags =~ /b/)
+                                 || ($cshMode    && $flags =~ /c/));
+
+    #
+    # Handle backtick expressions first
+    #
+    $value = doBackTicks($value);
+
+    #
+    # Handle substitutions
+    #
+    if ($flags =~ /s/) {
+        my ($substr, $val) = split(' ', $value, 2);
+        $_ = expand($val);
+        eval $substr;
+        $value = $_;
+        next unless $value;
+        $ENV{$var} = $value;
+    }
+
+    #
+    # See if path checking was specified.  Paths must be colon separated
+    #
+    if ($flags =~ /p/) {
+        #
+        # Split the path into directories, expand them, and see
+        # if the directory or file really exists.
+        #
+        my @newpath = ();
+        foreach my $elem (split(/:/, cleanPath(fixTenvPath($value)))) {
+            foreach my $expandedElem (split(/:/, expand($elem))) {
+                if (-d "$expandedElem" || -f "$expandedElem") {
+                    push(@newpath, $elem);
+                }
+            }
+        }
+
+        #
+        # Load a new $value, removing duplicates
+        #
+        $value = '';
+        my %seen;
+        foreach my $elem (@newpath) {
+            $seen{$elem}++;
+            $value .= ":$elem" if $seen{$elem} == 1;
+        }
+        $value =~ s/^://;
+    }
+
+    next unless $value;
+    if ($flags =~ /t/) {
+        $TENV{$var} = $value;
+        next;
+    }
+    $ENV{$var} = $value;
+
+    if ($flags =~ /e/) {
+        addVal(\@exportVars, $var, $value);
+    }
+    else {
+        addVal(\@localVars, $var, $value);
+    }
+}
+$fh->close();
+
+
+########################################################################
+#
+# Output appropriate syntax (Bourne or C-Shell) for exported variables
+#
+foreach my $ref (@exportVars) {
+    my ($shellVar, $shellValue) = ($ref->[0], $ref->[1]);
+    $shellValue = expand($shellValue) if $long;
+
+    if ($bourneMode) {
+        print $shellVar . "=" . $shellValue . "\n" . "export $shellVar\n";
+    }
+    else {
+        print "setenv $shellVar $shellValue\n";
+    }
+}
+
+########################################################################
+#
+# Output appropriate syntax (Bourne or C-Shell) for local variables
+#
+foreach my $ref (@localVars) {
+    my ($shellVar, $shellValue) = ($ref->[0], $ref->[1]);
+    $shellValue = expand($shellValue) if $long;
+
+    if ($bourneMode) {
+        print $shellVar . "=" . $shellValue . "\n";
+    }
+    else {
+        print "set $shellVar $shellValue\n";
+    }
+}
+exit 0;
+
+########################################################################
+########################################################################
+
+
+########################################################################
+#
+# Return a path with all %TENV values expanded
+#
+sub fixTenvPath {
+    my $path = shift;
+    my ($pre, $elem, $post);
+
+    my $done = 0;
+
+    while (!$done) {
+        my @newpath = ();
+        $done = 1;
+        foreach my $var (split(/:/, $path)) {
+            if ($var =~ /^\$/) {
+                #
+                # Slurp the text before and after the $ELEM
+                #
+                ($pre, $elem, $post) = $var =~ /^([^\$]*)\$\{?(\w+)\}?(.*)/;
+                if (defined $TENV{$elem}) {
+                    $done = 0;
+                    push(@newpath, $pre . $TENV{$elem} . $post);
+                }
+                else {
+                    push(@newpath, $var);
+                }
+            }
+            else {
+                push(@newpath, $var);
+            }
+        }
+        $path = join(':', @newpath);
+    }
+    return $path;
+}
+
+########################################################################
+#
+# Subroutine to do variable substitution.  Turns $VAR into its value
+#
+sub expand {
+    my $var = shift;
+    my ($pre, $elem, $post);
+
+    while ($var =~ /\$/) {
+        #
+        # Slurp the text before and after the $ELEM
+        #
+        ($pre, $elem, $post) = $var =~ /^([^\$]*)\$\{?(\w+)\}?(.*)/;
+        #
+        # Look for a previously defined value
+        #
+        if (defined $ENV{$elem}) {
+            $var = $pre . $ENV{$elem} . $post;
+        }
+        elsif (defined $TENV{$elem}) {
+            $var = $pre . $TENV{$elem} . $post;
+        }
+        else {
+            $var = $pre . $post;
+        }
+    }
+    return $var;
+}
+
+
+########################################################################
+#
+# Subroutine to clean out any colon separated entry which has
+# an invalid ${VAR} in it
+#
+sub cleanPath {
+    my $path = shift;
+
+    my @newpath = ();
+    foreach my $elem (split(/:/, $path)) {
+        push(@newpath, $elem) if hasValidVars($elem);
+    }
+
+    #
+    # Build and return a new path
+    #
+    return join(':', @newpath);
+}
+
+
+
+########################################################################
+#
+# Subroutine to check a ${VAR} for non-empty entries
+#
+sub hasValidVars {
+    my $var = shift;
+    my ($pre, $elem, $post);
+
+    while ($var =~ /\$/) {
+        #
+        # Slurp the text before and after the $ELEM
+        #
+        ($pre, $elem, $post) = $var =~ /^([^\$]*)\$\{?(\w+)\}?(.*)/;
+
+        #
+        # Look for a previously defined value
+        #
+        if (defined $ENV{$elem}) {
+            $var = $pre . $ENV{$elem} . $post;   # rinse and repeat
+        }
+        elsif (defined $TENV{$elem}) {
+            $var = $pre . $TENV{$elem} . $post;   # rinse and repeat
+        }
+        else {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+########################################################################
+#
+# Subroutine to perform backtick expansion
+#
+sub doBackTicks {
+    my $value = shift;
+
+    while ($value =~ /`[^`]*`/) {
+        my ($pre, $cmd, $post) = $value =~ /^([^`]*)`([^`]*)`(.*)/;
+        if (-x (split(' ',$cmd))[0]) {
+            my $elem = `$cmd`;
+            $elem =~ s/\s+$//;
+            $value = $pre . $elem . $post;
+        } else {
+            $value = $pre . $post;
+        }
+    }
+    return $value;
+}
+
+
+########################################################################
+#
+# Subroutine to add or replace an array entry
+#
+sub addVal {
+    my ($ref, $var, $value) = @_;
+
+    $value = fixTenvPath($value);
+    foreach my $entry (@$ref) {
+        next unless $entry->[0] eq $var;
+        ($entry->[0], $entry->[1]) = ($var, $value);
+        return;
+    }
+    push (@$ref, [$var, $value]);
+}
+
+
+
+########################################################################
+#
+# Usage
+#
+no strict;
+sub usage {
+    my $bname = substr($0, rindex($0, "/") + 1);
+    print STDERR <<Eof_Usage;
+Usage: $bname [-b]ourne [-c]shell [-l]ong [-h]elp
+       -bourne  Output Bourne shell syntax, this is the default.
+       -cshell  Output C-shell syntax.
+       -long    Output results with variable substitution.
+       -help    You're looking at it.
+
+$bname Version $Version
+
+vars lets you maintain a single file of shell environment variables.  It
+is meant to be invoked from a .profile, .xsession, .cshrc, etc.  Here is
+how I use it in my .xsession and .cshrc
+
+# .xsession
+# Get my environment variables
+if [ -x \$HOME/bin/vars ]; then
+    \$HOME/bin/vars -b > \$HOME/.env_sh; . \$HOME/.env_sh
+else
+    . \$HOME/.env_sh   # use a previously generated version
+fi
+
+
+#.cshrc
+# Get my environment variables
+if ( -x \$HOME/bin/vars ) then
+    \$HOME/bin/vars -c >! \$HOME/.env_csh; source \$HOME/.env_csh
+else
+    source \$HOME/.env_csh
+endif
+
+
+The file \$HOME/.vars is read for a list of processing flags, variables,
+and values as shown below.  Note that values can span multiple lines if
+the preceding line ends in a backslash (\\).  Lines beginning with '#' are
+considered comments and are ignored.
+
+Example \$HOME/.vars file:
+#Flags  Variable               Value
+# cbpe
+#-----  ---------------------  --------------------------------------------
+cb      MOZILLA_HOME           /usr/local/netscape
+cbp     PATH                   /usr/local/man:/usr/lib/perl5/man:/usr/man:\\
+                               /usr/X11R6/man:$HOME/man
+cbpes   MANPATH s,/bin,/man,g  \$PATH
+cbpe    NPX_PLUGIN_PATH        \$MOZILLA_HOME/plugins
+
+The flags 'cb' tells vars the variable 'MOZILLA_HOME' is eligible for output in
+C-Shell (-cshell) syntax and Bourne shell (-bourne) syntax depending on if a -c
+or -b option was given.
+
+The flag 'p' tells vars to perform PATH existence checking.  If any file or
+directory within the colon separated list does not exist it will be removed.
+
+The 'e' flag tells vars to output an "export syntax", C-shell uses 'setenv',
+while Bourne shell uses 'export'.
+
+The 's' flag tells vars to perform a substitution on a previously defined
+variable.  The example above sets 'MANPATH' to everything in 'PATH' after
+substituting all occurrences of 'bin' with 'man'.  This is a simple way to keep
+your man pages in sync with their associated commands.
+
+Variable substituion is handled by checking the list of defined variables within
+the \$HOME/.vars file, followed by variables inherited from the environment.  If
+vars is given a -l option, then variable subtituion is performed on the value
+before it is output.  For example, vars -b will output:
+
+MOZILLA_HOME=/usr/local/netscape-4.76
+NPX_PLUGIN_PATH=\$MOZILLA_HOME/plugins
+
+While vars -b -l will output:
+
+MOZILLA_HOME=/usr/local/netscape-4.76
+NPX_PLUGIN_PATH=/usr/local/netscape-4.76/plugins
+
+Variables may be enclosed within braces (\{\}) for clarity:
+cbpe    NPX_PLUGIN_PATH     \$\{MOZILLA_HOME}/plugins
+
+Eof_Usage
+    exit 1;
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use strict;
+use open qw/:std :encoding(UTF-8)/;
+use feature 'unicode_strings';
+
+# \p{Z}: any kind of whitespace or invisible separator.
+#   \p{Zs}: a whitespace character that is invisible, but does take up space.
+#   \p{Zl}: line separator character U+2028.
+#   \p{Zp}: paragraph separator character U+2029.
+# \p{Space}: A whitespace character: [ \t\n\x0B\f\r]
+
+while (my $line = <>) {
+    $line =~ s/^[\p{Space}\p{Z}]+|[\p{Space}\p{Z}]+$//g;
+    print $line . "\n";
+}
