@@ -230,6 +230,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # ssh -p 2222 $USER@localhost
 # ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost
 
+# to append your public key to ~/.ssh/authorized_keys
+# ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost
+
 ##############################################################################################
 
 # the admin user
@@ -316,4 +319,7 @@ if [ $? -eq 0 ]; then
     echo "${g}ssh -p 2222 $USER@localhost${rt}"
     echo "     or"
     echo "${g}ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost${rt}"
+    echo
+    echo "# to append your public key to ~/.ssh/authorized_keys"
+    echo "${g}ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost${rt}"
 fi

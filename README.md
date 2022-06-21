@@ -135,6 +135,9 @@ mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared ubu
 ssh -p 2222 dave@localhost
      or
 ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error dave@localhost
+
+# to append your public key to ~/.ssh/authorized_keys
+ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub dave@localhost
 ~~~
 
 ---
