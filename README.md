@@ -139,8 +139,6 @@ ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLe
 
 **Persisting** changes made to a **running** container using **docker commit container_id tag**
 
-===
-
 (from shell 1, no containers running)
 -------------------------------------
 ~~~sh
