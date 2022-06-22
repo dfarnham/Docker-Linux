@@ -52,7 +52,6 @@ if [ "$color_prompt" = yes ]; then
     # You’ll get the next string:
     # purple history number \!,
     # white :,
-    # Last error code $?,
     # green ✓ if error code is 0, red ✗ if not,
     # light green username,
     # light red symbol @,
@@ -61,7 +60,7 @@ if [ "$color_prompt" = yes ]; then
     # pink current dir,
     # '#' if root or '$' if user,
     # white >
-    PS1='\[\033[00;35m\]\!\[\033[0m\]: \[\033[01;37m\]$? $(if [[ $? == 0 ]]; then echo "\[\033[01;32m\]\342\234\223"; else echo "\[\033[01;31m\]\342\234\227"; fi) \[\033[01;32m\]\u\[\033[01;31m\]@\[\033[01;36m\]\h\[\033[01;33m\]:\[\033[01;35m\]\w\[\033[0m\]\$>\[\]'
+    PS1='\[\033[00;35m\]\!\[\033[0m\]: $(if [[ $? == 0 ]]; then echo "\[\033[01;32m\]\342\234\223"; else echo "\[\033[01;31m\]\342\234\227"; fi) \[\033[01;32m\]\u\[\033[01;31m\]@\[\033[01;36m\]\h\[\033[01;33m\]:\[\033[01;35m\]\w\[\033[0m\]\$>\[\]'
 else
     PS1='\! \u@\h:\w\$ '
 fi
