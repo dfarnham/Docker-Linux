@@ -2,7 +2,8 @@
 
 [Latest Version]: https://img.shields.io/badge/Docker_Linux-v0.1.0-blue
 
-### Generates Dockerfiles for Linux distributions **Debian**, **openSUSE**, **RedHat**, **Ubuntu** which have common tooling and a configured user account.
+### Generates Dockerfiles for Linux distributions **Debian**, **openSUSE**, **RedHat**, **Ubuntu**
+#### Common tooling and configured admin account 
 
 Features:
 
