@@ -19,6 +19,7 @@ To create the Docker build directories run **buildDockerDirs.sh**:
 
 ~~~sh
 # create the build directory for each distribution with defaults
+buildDockerDirs.sh -d debian
 buildDockerDirs.sh -d opensuse
 buildDockerDirs.sh -d redhat
 buildDockerDirs.sh -d ubuntu
@@ -83,6 +84,7 @@ press enter to "docker build -t ubuntu ubuntu-kinetic" or ctrl-c to quit and ins
 ~~~sh
 Usage: buildDockerDirs.sh [OPTIONS] -d distribution
     -d  distribution        # distribution to build
+          debian   - debian:bullseye
           opensuse - opensuse/leap
           redhat   - redhat/ubi9
           ubuntu   - ubuntu:kinetic

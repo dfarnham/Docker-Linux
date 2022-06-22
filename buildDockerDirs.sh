@@ -23,10 +23,10 @@ cat >&2 << EOF
 
 Usage: `basename $0` [OPTIONS] -d distribution
     -d  distribution        # distribution to build
+          debian   - $DEBIAN_BULLSEYE
           opensuse - $OPENSUSE_LEAP
           redhat   - $REDHAT_UBI9
           ubuntu   - $UBUNTU_KINETIC
-          debian   - $DEBIAN_BULLSEYE
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
