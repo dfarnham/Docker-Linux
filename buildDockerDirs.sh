@@ -53,7 +53,9 @@ rt=$(tput sgr0); r=$(tput setaf 1); g=$(tput setaf 2); y=$(tput setaf 3); c=$(tp
 
 # capture the calling args and time
 invoked="$0 $@"
+calendar=`date "+%a %h %d    %D    Time: %r"`
 timestamp=`date +.%Y%m%d_%H%M%S`
+
 
 
 # where the user home files exists
@@ -251,6 +253,7 @@ howto_info=`cat << 'EOM'
 echo "
 ##############################################################################################
 #
+# ${g}calendar: $calendar${rt}
 # ${g}timestamp: $timestamp${rt}
 # ${g}$invoked${rt}
 #
@@ -261,7 +264,7 @@ echo "
 # ${g}mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}
 
 # to connect to the running container as ${y}admin $USER${rt}
-# ${g}ssh -p 2222 $USER@localhost
+# ${g}ssh -p 2222 $USER@localhost${rt}
 # ${g}ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost${rt}
 
 # to append a public key to ~$USER/.ssh/authorized_keys
