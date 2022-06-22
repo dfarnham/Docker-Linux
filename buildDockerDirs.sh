@@ -52,7 +52,7 @@ EOF
 rt=$(tput sgr0); r=$(tput setaf 1); g=$(tput setaf 2); y=$(tput setaf 3); c=$(tput setaf 6); b=$(tput bold);
 
 # capture the calling args and time
-invoked="$0 $@"
+args="$0 $@"
 calendar=`date "+%a %h %d    %D    Time: %r"`
 timestamp=`date +.%Y%m%d_%H%M%S`
 
@@ -205,21 +205,26 @@ if [ $docker_image = $OPENSUSE_LEAP ]; then
     PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
+    FIX_LOCALE="echo skipping"
 elif [ $docker_image = $REDHAT_UBI9 ]; then
     SUDO_GROUP=wheel
     PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39"
     FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
     HOST_SSH_KEYS='ssh-keygen -A'
+    FIX_LOCALE="echo skipping"
 elif [ $docker_image = $UBUNTU_KINETIC ]; then
     SUDO_GROUP=sudo
     PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
     FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
     HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
+    FIX_LOCALE="echo skipping"
 elif [ $docker_image = $DEBIAN_BULLSEYE ]; then
     SUDO_GROUP=sudo
-    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
+    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2 locales man-db openssh-client openssh-server man-db perl python3 r-base tree"
+    FIX_LOCALE="sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales"
     FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
     HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
+    FIX_LOCALE="echo skipping"
 else
     echo "Bug! Docker image not matched: [$docker_image]"
     echo "Bug! Distrubtions: $DISTRIBUTIONS"
@@ -255,7 +260,7 @@ echo "
 #
 # ${g}calendar: $calendar${rt}
 # ${g}timestamp: $timestamp${rt}
-# ${g}$invoked${rt}
+# ${g}$args${rt}
 #
 # to build the container:
 # ${g}$build_cmd${rt}
@@ -311,6 +316,9 @@ RUN useradd -r -m -d /home/\$USER -c "\$USER_NAME" -s /bin/bash -u \$USER_UID -g
 
 # modify /etc/sudoers
 RUN $FIX_SUDOERS
+
+# fix locale
+RUN $FIX_LOCALE
 
 # become the USER
 USER \$USER
