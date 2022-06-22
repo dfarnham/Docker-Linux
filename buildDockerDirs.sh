@@ -211,24 +211,16 @@ fi
 # configure dynamic components
 VIM_PLUGIN_CMD='echo "skipping Vim pathogen bundles"'
 if [ ! -z "$VIM_PLUGINS" ]; then
-    VIM_PLUGIN_CMD="mkdir -p /home/\$USER/.vim/autoload /home/\$USER/.vim/bundle && \
-        curl -LSso /home/\$USER/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-        "
+    VIM_PLUGIN_CMD="mkdir -p /home/\$USER/.vim/autoload /home/\$USER/.vim/bundle && curl -LSso /home/\$USER/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim"
     for plugin in $VIM_PLUGINS
     do
-        VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && \
-            ( cd /home/\$USER/.vim/bundle && \
-              rm -rf `basename $plugin` && \
-              git clone https://github.com/${plugin}.git )
-        "
+        VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && ( cd /home/\$USER/.vim/bundle && rm -rf `basename $plugin` && git clone https://github.com/${plugin}.git )"
     done
 fi
 
 RUST_CMD='echo "skipping Rust crates"'
 if [ ! -z "$RUST_CRATES" ]; then
-    RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \
-        \$HOME/.cargo/bin/cargo install $RUST_CRATES
-    "
+    RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \$HOME/.cargo/bin/cargo install $RUST_CRATES"
 fi
 
 ####################################################
