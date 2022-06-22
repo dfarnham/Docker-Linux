@@ -5,18 +5,40 @@
 
 # current supported distributions by this script
 OPENSUSE_LEAP='opensuse/leap'
-OPENSUSE_DEFAULT_TAG=`echo "$OPENSUSE_LEAP" | sed 's,[/:].*,,'`
-
 REDHAT_UBI9='redhat/ubi9'
-REDHAT_DEFAULT_TAG=`echo "$REDHAT_UBI9" | sed 's,[/:].*,,'`
-
 UBUNTU_KINETIC='ubuntu:kinetic'
-UBUNTU_DEFAULT_TAG=`echo "$UBUNTU_KINETIC" | sed 's,[/:].*,,'`
-
 DEBIAN_BULLSEYE='debian:bullseye'
-DEBIAN_DEFAULT_TAG=`echo "DEBIAN_BULLSEYE" | sed 's,[/:].*,,'`
 
 DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSEYE]"
+
+############################################################################
+# Note:
+#   I'm installing a set of workable packages I desire for each distribution
+#   maintaining custom utility portability across architectures is fluid
+############################################################################
+
+# specific to each distribution: sudo, locale, system ssh host keys,
+# package specific names (e.g. openssh vs openssh-clients + openssh-server)
+shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
+ 
+DEBIAN_INSTALL="apt-get update && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
+    sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
+    sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
+    mkdir /run/sshd && ssh-keygen -A
+    "
+OPENSUSE_INSTALL="zypper refresh && \
+    zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree && \
+    groupadd wheel && \
+    ln -s /usr/bin/python3.9 /usr/bin/python3 && \
+    sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
+    ssh-keygen -A
+    "
+REDHAT_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 && \
+    sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
+    ssh-keygen -A
+    "
+UBUNTU_INSTALL="$DEBIAN_INSTALL"
 
 usage='
 cat >&2 << EOF
@@ -98,17 +120,25 @@ do
         -d)
             shift
             case $1 in
+                debian)
+                    docker_image=$DEBIAN_BULLSEYE
+                    SUDO_GROUP=sudo
+                    INSTALL="$DEBIAN_INSTALL"
+                    ;;
                 opensuse)
                     docker_image=$OPENSUSE_LEAP
+                    SUDO_GROUP=wheel
+                    INSTALL="$OPENSUSE_INSTALL"
                     ;;
                 redhat)
                     docker_image=$REDHAT_UBI9
+                    SUDO_GROUP=wheel
+                    INSTALL="$REDHAT_INSTALL"
                     ;;
                 ubuntu)
                     docker_image=$UBUNTU_KINETIC
-                    ;;
-                debian)
-                    docker_image=$DEBIAN_BULLSEYE
+                    SUDO_GROUP=sudo
+                    INSTALL="$UBUNTU_INSTALL"
                     ;;
                 *)
                     echo "${r}Error:${rt} distribution: [$1]"
@@ -178,74 +208,27 @@ if [ `expr "$USER_UID" : '^[0-9][0-9]*$'` -eq 0 ]; then
 fi
 
 ####################################################
-
-# create the build_dir with user_home_files
-mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_files.tar.bz2 .)
-
-# setup sudo group and package install
-#   sudo groups and /etc/sudoers vary by distribution
-#   package installers vary by distribution
-#
-
-############################################################################
-# Note:
-#   I'm installing a set of workable packages I desire for each distribution
-#   maintaining custom utility portability across architectures is fluid
-############################################################################
-
-# these share the same package name across all currently supported distributions
-shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
-
-# specific to each distributions are how to end up with sudo ALL=ALL privileges and
-# additional package names for each distribution (e.g. openssh vs openssh-clients + openssh-server)
-
-# set SUDO_GROUP, PKG_INSTALL, HOST_SSH_KEYS
-if [ $docker_image = $OPENSUSE_LEAP ]; then
-    SUDO_GROUP=wheel
-    PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
-    FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
-    HOST_SSH_KEYS='ssh-keygen -A'
-    FIX_LOCALE="echo skipping"
-elif [ $docker_image = $REDHAT_UBI9 ]; then
-    SUDO_GROUP=wheel
-    PKG_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39"
-    FIX_SUDOERS='sed -i "s,# %wheel,%wheel," /etc/sudoers'
-    HOST_SSH_KEYS='ssh-keygen -A'
-    FIX_LOCALE="echo skipping"
-elif [ $docker_image = $UBUNTU_KINETIC ]; then
-    SUDO_GROUP=sudo
-    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
-    FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
-    HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
-    FIX_LOCALE="echo skipping"
-elif [ $docker_image = $DEBIAN_BULLSEYE ]; then
-    SUDO_GROUP=sudo
-    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2 locales man-db openssh-client openssh-server man-db perl python3 r-base tree"
-    FIX_LOCALE="sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales"
-    FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
-    HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
-    FIX_LOCALE="echo skipping"
-else
-    echo "Bug! Docker image not matched: [$docker_image]"
-    echo "Bug! Distrubtions: $DISTRIBUTIONS"
-    exit 1
-fi
-
 # configure dynamic components
+VIM_PLUGIN_CMD='echo "skipping Vim pathogen bundles"'
 if [ ! -z "$VIM_PLUGINS" ]; then
-    VIM_PLUGIN_CMD="mkdir -p /home/\$USER/.vim/autoload /home/\$USER/.vim/bundle && curl -LSso /home/\$USER/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim"
+    VIM_PLUGIN_CMD="mkdir -p /home/\$USER/.vim/autoload /home/\$USER/.vim/bundle && \
+        curl -LSso /home/\$USER/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+        "
     for plugin in $VIM_PLUGINS
     do
-        VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && (cd /home/\$USER/.vim/bundle && rm -rf `basename $plugin` && git clone https://github.com/${plugin}.git)"
+        VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && \
+            ( cd /home/\$USER/.vim/bundle && \
+              rm -rf `basename $plugin` && \
+              git clone https://github.com/${plugin}.git )
+        "
     done
-else
-    VIM_PLUGIN_CMD='echo "skipping vim pathogen and bundles"'
 fi
 
+RUST_CMD='echo "skipping Rust crates"'
 if [ ! -z "$RUST_CRATES" ]; then
-    RUST_CMD="(curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y) && \$HOME/.cargo/bin/cargo install $RUST_CRATES"
-else
-    RUST_CMD='echo "skipping Rust and crates"'
+    RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \
+        \$HOME/.cargo/bin/cargo install $RUST_CRATES
+    "
 fi
 
 ####################################################
@@ -285,11 +268,15 @@ unset rt r g y c b
 howto_comment=`eval "$howto_info"`
 
 # create Dockerfile
+
+# create the build_dir with user_home_files
+mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_files.tar.bz2 .)
+
 cat > $build_dir/Dockerfile << EOD
 FROM $docker_image
 $howto_comment
-ENV DEBIAN_FRONTEND=noninteractive
 
+ENV DEBIAN_FRONTEND=noninteractive
 
 # the admin user
 ENV USER='$USER'
@@ -301,11 +288,8 @@ ENV USER_SHA='$USER_SHA'
 ENV ROOT_SHA='$ROOT_SHA'
 RUN sed -i "s,root:[^:]*:,root:\$ROOT_SHA:," /etc/shadow
 
-# install packages
-RUN $PKG_INSTALL
-
-# generate system ssh host keys (requires openssh installed)
-RUN $HOST_SSH_KEYS
+# install packages, setup sudo, locale, system ssh host keys
+RUN $INSTALL
 
 ########################
 # setup the USER account
@@ -313,12 +297,6 @@ RUN $HOST_SSH_KEYS
 
 # add the USER as a system user in group $SUDO_GROUP which has sudo ALL = (ALL) NOPASSWD: ALL
 RUN useradd -r -m -d /home/\$USER -c "\$USER_NAME" -s /bin/bash -u \$USER_UID -g 100 -G $SUDO_GROUP -p "\$USER_SHA" \$USER
-
-# modify /etc/sudoers
-RUN $FIX_SUDOERS
-
-# fix locale
-RUN $FIX_LOCALE
 
 # become the USER
 USER \$USER
