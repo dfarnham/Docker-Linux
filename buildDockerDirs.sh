@@ -249,8 +249,8 @@ echo "
 
 # to append a public key to ~$USER/.ssh/authorized_keys
 # ${g}ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost${rt}
-"
 ####################################################
+"
 EOM`
 
 # turn off colors to build a comment for the Dockerfile from the howto
