@@ -3,12 +3,6 @@
 # dwf -- initial
 # Fri Jun 17 22:36:41 MDT 2022
 
-#== Colors
-rt=$(tput sgr0); r=$(tput setaf 1); g=$(tput setaf 2); y=$(tput setaf 3); c=$(tput setaf 6); b=$(tput bold);
-
-invoked="$0 $@"
-timestamp=`date +.%Y%m%d_%H%M%S`
-
 # current supported distributions by this script
 OPENSUSE_LEAP='opensuse/leap'
 OPENSUSE_DEFAULT_TAG=`echo "$OPENSUSE_LEAP" | sed 's,[/:].*,,'`
@@ -19,8 +13,10 @@ REDHAT_DEFAULT_TAG=`echo "$REDHAT_UBI9" | sed 's,[/:].*,,'`
 UBUNTU_KINETIC='ubuntu:kinetic'
 UBUNTU_DEFAULT_TAG=`echo "$UBUNTU_KINETIC" | sed 's,[/:].*,,'`
 
-# where the user home files exists
-user_home_files=user_home
+DEBIAN_BULLSEYE='debian:bullseye'
+DEBIAN_DEFAULT_TAG=`echo "DEBIAN_BULLSEYE" | sed 's,[/:].*,,'`
+
+DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSEYE]"
 
 usage='
 cat >&2 << EOF
@@ -30,6 +26,7 @@ Usage: `basename $0` [OPTIONS] -d distribution
           opensuse - $OPENSUSE_LEAP
           redhat   - $REDHAT_UBI9
           ubuntu   - $UBUNTU_KINETIC
+          debian   - $DEBIAN_BULLSEYE
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
@@ -46,6 +43,22 @@ EOF
     exit 1
 '
 
+####################################################
+
+#== Colors
+# select graphic rendition 0=default, red, green, yellow, cyan, blue
+#   infocmp -1 ansi | grep sgr0=
+#   sgr0=\E[0;10m,
+rt=$(tput sgr0); r=$(tput setaf 1); g=$(tput setaf 2); y=$(tput setaf 3); c=$(tput setaf 6); b=$(tput bold);
+
+# capture the calling args and time
+invoked="$0 $@"
+timestamp=`date +.%Y%m%d_%H%M%S`
+
+
+# where the user home files exists
+# these are copied to the admin's home directory in the container
+user_home_files=user_home
 if [ ! -d $user_home_files ]; then
     echo "${r}Error:${rt} missing user home directory: $user_home_files"
     eval "$usage"
@@ -59,6 +72,8 @@ USER_UID=`id | sed -e 's,[^=]*=,,' -e 's,(.*,,'`
 USER_SHA=`openssl passwd -1 admin`
 ROOT_SHA=`openssl passwd -1 root`
 
+
+# process the command line options
 while :
 do
     case $1 in
@@ -89,6 +104,9 @@ do
                     ;;
                 ubuntu)
                     docker_image=$UBUNTU_KINETIC
+                    ;;
+                debian)
+                    docker_image=$DEBIAN_BULLSEYE
                     ;;
                 *)
                     echo "${r}Error:${rt} distribution: [$1]"
@@ -127,11 +145,10 @@ do
     shift
 done
 
-########################
-## More Sanity Checks ##
-########################
+#############################
+## Perform some sanity checks
+#############################
 if [ -z "$docker_image" ]; then
-    #echo "$(tput setaf 3)Error: missing -d distribution$(tput setaf 1)"
     echo "${r}Error:${rt} ${y}missing -d distribution${rt}"
     eval "$usage"
 fi
@@ -158,6 +175,8 @@ if [ `expr "$USER_UID" : '^[0-9][0-9]*$'` -eq 0 ]; then
     exit 1
 fi
 
+####################################################
+
 # create the build_dir with user_home_files
 mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_files.tar.bz2 .)
 
@@ -165,10 +184,20 @@ mkdir -p $build_dir && (cd $user_home_files && tar cfj ../$build_dir/$user_home_
 #   sudo groups and /etc/sudoers vary by distribution
 #   package installers vary by distribution
 #
-# installing a set of workable packages I desire for each distribution and
-# maintaining custom utility portability across architectures is fluid
+
+############################################################################
+# Note:
+#   I'm installing a set of workable packages I desire for each distribution
+#   maintaining custom utility portability across architectures is fluid
+############################################################################
+
+# these share the same package name across all currently supported distributions
 shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
 
+# specific to each distributions are how to end up with sudo ALL=ALL privileges and
+# additional package names for each distribution (e.g. openssh vs openssh-clients + openssh-server)
+
+# set SUDO_GROUP, PKG_INSTALL, HOST_SSH_KEYS
 if [ $docker_image = $OPENSUSE_LEAP ]; then
     SUDO_GROUP=wheel
     PKG_INSTALL="zypper refresh && zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree && groupadd wheel && ln -s /usr/bin/python3.9 /usr/bin/python3"
@@ -184,9 +213,14 @@ elif [ $docker_image = $UBUNTU_KINETIC ]; then
     PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
     FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
     HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
+elif [ $docker_image = $DEBIAN_BULLSEYE ]; then
+    SUDO_GROUP=sudo
+    PKG_INSTALL="apt-get update && apt-get -y install $shared_pkg_names curl iputils-ping iproute2  man-db openssh-client openssh-server man-db perl python3 r-base tree"
+    FIX_SUDOERS='sed -i "s,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL," /etc/sudoers'
+    HOST_SSH_KEYS='mkdir /run/sshd && ssh-keygen -A'
 else
     echo "Bug! Docker image not matched: [$docker_image]"
-    echo "Bug! Distrubtions: [$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC]"
+    echo "Bug! Distrubtions: $DISTRIBUTIONS"
     exit 1
 fi
 
@@ -207,33 +241,47 @@ else
     RUST_CMD='echo "skipping Rust and crates"'
 fi
 
-# create Dockerfile
+####################################################
+
+# define the build command
 build_cmd="docker build -t $TAG_NAME $build_dir"
-#unset rt r g y c b
-cat > $build_dir/Dockerfile << EOD
-FROM $docker_image
 
-ENV DEBIAN_FRONTEND=noninteractive
-
+# build a howto for this container
+howto_info=`cat << 'EOM'
+echo "
 ##############################################################################################
 #
-# timestamp: $timestamp
-# $invoked
+# ${g}timestamp: $timestamp${rt}
+# ${g}$invoked${rt}
 #
 # to build the container:
-# $build_cmd
+# ${g}$build_cmd${rt}
 
 # to run the container exposing a shared directory and mapping localhost port 2222 to 22
-# mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME
+# ${g}mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}
 
-# to connect to the running container as admin $USER
-# ssh -p 2222 $USER@localhost
-# ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost
+# to connect to the running container as ${y}admin $USER${rt}
+# ${g}ssh -p 2222 $USER@localhost
+# ${g}ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost${rt}
 
-# to append your public key to ~/.ssh/authorized_keys
-# ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost
+# to append a public key to ~$USER/.ssh/authorized_keys
+# ${g}ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost${rt}
+"
+EOM`
 
-##############################################################################################
+####################################################
+
+
+# turn off colors to build a comment for the Dockerfile from the howto
+unset rt r g y c b
+howto_comment=`eval "$howto_info"`
+
+# create Dockerfile
+cat > $build_dir/Dockerfile << EOD
+FROM $docker_image
+$howto_comment
+ENV DEBIAN_FRONTEND=noninteractive
+
 
 # the admin user
 ENV USER='$USER'
@@ -286,14 +334,23 @@ WORKDIR /root
 ENTRYPOINT /usr/sbin/sshd && /bin/bash
 EOD
 
-echo \# ===========================================
-echo \# $build_dir/Dockerfile -- $docker_image
-echo \# ===========================================
-echo \# USER=$USER
-echo \# USER_NAME=$USER_NAME
-echo \# USER_UID=$USER_UID
-echo \# USER_SHA=$USER_SHA
-echo \# ROOT_SHA=$ROOT_SHA
+####################################################
+
+# assign the color variables
+rt=$(tput sgr0); r=$(tput setaf 1); g=$(tput setaf 2); y=$(tput setaf 3); c=$(tput setaf 6); b=$(tput bold);
+
+# display build information
+cat << INFO
+# ===========================================
+# $build_dir/Dockerfile -- $docker_image
+# ===========================================
+# USER=$USER
+# USER_NAME=$USER_NAME
+# USER_UID=$USER_UID
+# USER_SHA=$USER_SHA
+# ROOT_SHA=$ROOT_SHA
+INFO
+
 if [ ! -z "$VIM_PLUGINS" ]; then
     echo \# Vim plugins: ~${USER}/.vim/bundle: $VIM_PLUGINS
 fi
@@ -301,25 +358,16 @@ if [ ! -z "$RUST_CRATES" ]; then
     echo \# Rust crates: ~${USER}/.cargo/bin: $RUST_CRATES
 fi
 
+####################################################
+
+# ask to run docker build
 if [ "$run_docker_build" = "yes" ]; then
     echo press "${g}enter${rt} to ${y}\"docker build -t $TAG_NAME $build_dir\"${rt} or ${r}ctrl-c${rt} to quit and inspect ${y}$build_dir/Dockerfile${rt}"
     read answer
     eval "$build_cmd"
 fi
 
+# display the colorized howto if the build succeeded
 if [ $? -eq 0 ]; then
-    echo
-    echo "# to build the container"
-    echo "${g}docker build -t $TAG_NAME $build_dir${rt}"
-    echo
-    echo "# to run the container exposing a shared directory and mapping localhost port 2222 to 22"
-    echo "${g}mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}"
-    echo
-    echo "# to connect to the running container as admin $USER"
-    echo "${g}ssh -p 2222 $USER@localhost${rt}"
-    echo "     or"
-    echo "${g}ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=error $USER@localhost${rt}"
-    echo
-    echo "# to append your public key to ~/.ssh/authorized_keys"
-    echo "${g}ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub $USER@localhost${rt}"
+    eval "$howto_info"
 fi
