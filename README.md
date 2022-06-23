@@ -124,12 +124,16 @@ add ssh public key
 
 ![add ssh key](pictures/Docker-Linux-ssh-copy-id.jpg)
 
+---
+
 ~~~
 login - display sudo privs -- write a file
 ------------------------------------------
 ~~~
 
 ![login](pictures/Docker-Linux-login.jpg)
+---
+
 ---
 
 ~~~
