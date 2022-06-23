@@ -107,11 +107,10 @@ The **-x** option will prompt to issue the **docker build** command
 
 # **Persisting** changes to a running container
 
-(from shell 1, no containers running)
 ----
 ~~~
-from shell 1, start a container instance)
------------------------------------------
+from shell 1, start a container instance
+----------------------------------------
 ~~~
 
 ![start container](pictures/Docker-Linux-start.jpg)
@@ -126,16 +125,16 @@ from shell 2, add ssh public key
 ![add ssh key](pictures/Docker-Linux-ssh-copy-id.jpg)
 
 ~~~
-from shell 2, connect - display sudo privs -- write a file
-----------------------------------------------------------
+login - display sudo privs -- write a file
+------------------------------------------
 ~~~
 
 ![login](pictures/Docker-Linux-login.jpg)
 ---
 
 ~~~
-from shell 3, view data in the running container - commit changes
------------------------------------------------------------------
+from shell 3, verify change in the running container - commit changes
+---------------------------------------------------------------------
 ~~~
 
 ![commit changes](pictures/Docker-Linux-commit-save.jpg)
