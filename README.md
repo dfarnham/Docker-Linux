@@ -109,8 +109,8 @@ The **-x** option will prompt to issue the **docker build** command
 
 ----
 ~~~
-from shell 1, start a container instance
-----------------------------------------
+start the container instance
+----------------------------
 ~~~
 
 ![start container](pictures/Docker-Linux-start.jpg)
@@ -118,8 +118,8 @@ from shell 1, start a container instance
 ---
 
 ~~~
-from shell 2, add ssh public key
---------------------------------
+add ssh public key
+------------------
 ~~~
 
 ![add ssh key](pictures/Docker-Linux-ssh-copy-id.jpg)
@@ -133,8 +133,8 @@ login - display sudo privs -- write a file
 ---
 
 ~~~
-from shell 3, verify change in the running container - commit changes
----------------------------------------------------------------------
+verify change in the running container - commit changes
+-------------------------------------------------------
 ~~~
 
 ![commit changes](pictures/Docker-Linux-commit-save.jpg)
