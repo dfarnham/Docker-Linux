@@ -28,7 +28,7 @@ buildDockerDirs.sh -d ubuntu
 
 ---
 
-The **user_common** directory contains files and utilities which will be copied to the user account
+The **user_common** directory contains files and utilities copied to the container's user account (.bashrc, .vimrc, bin/* ...)
 
 ~~~sh
 user_home/
