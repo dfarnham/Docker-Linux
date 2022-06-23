@@ -70,16 +70,6 @@ user_home/
 
 ---
 
-The **-x** option will prompt to issue the **docker build** command
-
-![option -x](pictures/Docker-Linux-build-option-x.jpg)
-
-... [docker build completes] ...
-
-![option -x](pictures/Docker-Linux-build-complete.jpg)
-
----
-
 **buildDockerDirs.sh** has a few configurable options
 
 ~~~sh
@@ -102,6 +92,16 @@ Options:
 
     -x  execute             # opportunity to execute the docker build on the completed directory
 ~~~
+
+---
+
+The **-x** option will prompt to issue the **docker build** command
+
+![option -x](pictures/Docker-Linux-build-option-x.jpg)
+
+... [docker build completes] ...
+
+![option -x](pictures/Docker-Linux-build-complete.jpg)
 
 ---
 
