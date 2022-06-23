@@ -341,6 +341,7 @@ fi
 
 # ask to run docker build
 if [ "$run_docker_build" = "yes" ]; then
+    echo
     echo press "${g}enter${rt} to ${y}\"docker build -t $TAG_NAME $build_dir\"${rt} or ${r}ctrl-c${rt} to quit and inspect ${y}$build_dir/Dockerfile${rt}"
     read answer
     eval "$build_cmd"
