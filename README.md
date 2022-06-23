@@ -109,7 +109,7 @@ The **-x** option will prompt to issue the **docker build** command
 
 (from shell 1, no containers running)
 ----
-~~~sh
+~~~
 from shell 1, no containers running)
 ------------------------------------
 ~~~
@@ -118,7 +118,7 @@ from shell 1, no containers running)
 
 ---
 
-~~~sh
+~~~
 from shell 2, connect - display sudo privs -- write a file
 ----------------------------------------------------------
 ~~~
@@ -126,7 +126,7 @@ from shell 2, connect - display sudo privs -- write a file
 ![option -x](pictures/Docker-Linux-login.jpg)
 ---
 
-~~~sh
+~~~
 from shell 3, view data in the running container - commit changes
 -----------------------------------------------------------------
 ~~~
