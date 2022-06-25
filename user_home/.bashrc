@@ -166,7 +166,7 @@ alias p5='openssl passwd -5' # Use the SHA256 based algorithms defined by Ulrich
 alias p6='openssl passwd -6' # Use the SHA512 based algorithms defined by Ulrich Drepper
 alias yc='conda config --set auto_activate_base true'
 alias nc='conda config --set auto_activate_base false'
-alias nocomment='egrep -v "^[[:space:]]*[#;]|^[[:space:]]*$" $1'
+alias nocomment='egrep -v "^[[:space:]]*(#|$)"'
 alias sha1='shasum -a 1'
 alias sha2='shasum -a 256'
 
