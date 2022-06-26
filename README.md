@@ -35,6 +35,8 @@ user_home/
 ├── .bash_logout
 ├── .bash_profile
 ├── .bashrc
+├── .editrc
+├── .inputrc
 ├── .ssh
 │   └── authorized_keys
 ├── .vars
