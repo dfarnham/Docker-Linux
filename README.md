@@ -124,7 +124,7 @@ add ssh public key
 ------------------
 ~~~
 
-![add ssh key](pictures/Docker-Linux-ssh-copy-id.png)
+![add ssh key](pictures/Docker-Linux-ssh-copy-keys.png)
 
 ---
 
