@@ -99,11 +99,11 @@ Options:
 
 The **-x** option will prompt to issue the **docker build** command
 
-![option -x](pictures/Docker-Linux-build-option-x.png)
+![option -x](pictures/1-Docker-Linux-build-option-x.png)
 
 ... [docker build completes] ...
 
-![option -x](pictures/Docker-Linux-build-complete.png)
+![option -x](pictures/2-Docker-Linux-build-complete.png)
 
 ---
 
@@ -115,7 +115,7 @@ start the container instance
 ----------------------------
 ~~~
 
-![start container](pictures/Docker-Linux-start.png)
+![start container](pictures/3-Docker-Linux-start.png)
 
 ---
 
@@ -124,7 +124,7 @@ add ssh public key
 ------------------
 ~~~
 
-![add ssh key](pictures/Docker-Linux-ssh-copy-keys.png)
+![add ssh key](pictures/4-Docker-Linux-ssh-copy-keys.png)
 
 ---
 
@@ -133,7 +133,7 @@ login - display sudo privs -- write a file
 ------------------------------------------
 ~~~
 
-![login](pictures/Docker-Linux-login.png)
+![login](pictures/5-Docker-Linux-login.png)
 ---
 
 ---
@@ -143,5 +143,5 @@ verify change in the running container - commit changes
 -------------------------------------------------------
 ~~~
 
-![commit changes](pictures/Docker-Linux-commit-save.png)
+![commit changes](pictures/6-Docker-Linux-commit-save.png)
 
