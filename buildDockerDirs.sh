@@ -119,6 +119,7 @@ do
             ;;
         -d)
             shift
+            dist_name=$1
             case $1 in
                 debian)
                     docker_image=$DEBIAN_BULLSEYE
@@ -221,12 +222,13 @@ if [ ! -z "$VIM_PLUGINS" ]; then
     OIFS=$IFS
     IFS=', ' # set space and comma as delimiters
     read -a plugins <<< "$VIM_PLUGINS"
-    for plugin in "${plugins[@]}"
+    for plugin in ${plugins[@]}
     do
         VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && ( cd /home/\$USER/.vim/bundle && rm -rf `basename $plugin` && git clone https://github.com/${plugin}.git )"
     done
     IFS=$OIFS
-    VIM_PLUGINS=`echo "${plugins[@]}" | sed 's/ /,/g'`
+    VIM_PLUGINS=${plugins[@]}
+    VIM_PLUGINS=${VIM_PLUGINS// /,}
 fi
 
 RUST_CMD='echo "skipping Rust crates"'
@@ -236,7 +238,8 @@ if [ ! -z "$RUST_CRATES" ]; then
     read -a crates <<< "$RUST_CRATES"
     IFS=$OIFS
     RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \$HOME/.cargo/bin/cargo install ${crates[@]}"
-    RUST_CRATES=`echo "${crates[@]}" | sed 's/ /,/g'`
+    RUST_CRATES=${crates[@]}
+    RUST_CRATES=${RUST_CRATES// /,}
 fi
 
 ####################################################
@@ -245,7 +248,7 @@ fi
 build_cmd="docker build -t $TAG_NAME $build_dir"
 
 # build a howto for this container
-rerun="$(basename $0) -x -u $USER -n '$USER_NAME' -i $USER_UID -p '$USER_SHA' -r '$ROOT_SHA' -o $build_dir -t $TAG_NAME --vimplugins '$VIM_PLUGINS' --rustcrates '$RUST_CRATES'"
+rerun="$(basename $0) -x -d $dist_name -u $USER -n '$USER_NAME' -i $USER_UID -p '$USER_SHA' -r '$ROOT_SHA' -o $build_dir -t $TAG_NAME -vimplugins '$VIM_PLUGINS' -rustcrates '$RUST_CRATES'"
 howto_info=`cat << 'EOM'
 echo "
 ##############################################################################################
