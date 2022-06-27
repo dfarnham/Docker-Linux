@@ -76,11 +76,11 @@ user_home/
 
 ~~~sh
 Usage: buildDockerDirs.sh [OPTIONS] -d distribution
-    -d  distribution        # distribution to build
-          debian   - debian:bullseye
-          opensuse - opensuse/leap
-          redhat   - redhat/ubi9
-          ubuntu   - ubuntu:kinetic
+    -d  distribution
+          debian        # debian:bullseye
+          opensuse      # opensuse/leap
+          redhat        # redhat/ubi9
+          ubuntu        # ubuntu:kinetic
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
@@ -89,8 +89,8 @@ Options:
         password sha can be generated offline: openssl passwd -[156] cleartext
     -o  output              # Docker directory (defaults to distribution name, will not overwrite)
     -t  tag                 # Docker image tagname
-    -vimplugins "bundles"   # download vim pathogen and plugins from github e.g. -vimplugins "kien/ctrlp.vim scrooloose/nerdtree ..."
-    -rustcrates "crates"    # download the Rust compiler and build crates e.g. -rust "bat ripgrep ..."
+    -vimplugins "bundles"   # download vim pathogen and plugins from github e.g. -vimplugins "kien/ctrlp.vim,scrooloose/nerdtree,..."
+    -rustcrates "crates"    # download the Rust compiler and build crates e.g. -rust "bat,ripgrep,..."
 
     -x  execute             # opportunity to execute the docker build on the completed directory
 ~~~
@@ -99,11 +99,11 @@ Options:
 
 The **-x** option will prompt to issue the **docker build** command
 
-![option -x](pictures/Docker-Linux-build-option-x.jpg)
+![option -x](pictures/Docker-Linux-build-option-x.png)
 
 ... [docker build completes] ...
 
-![option -x](pictures/Docker-Linux-build-complete.jpg)
+![option -x](pictures/Docker-Linux-build-complete.png)
 
 ---
 
@@ -115,7 +115,7 @@ start the container instance
 ----------------------------
 ~~~
 
-![start container](pictures/Docker-Linux-start.jpg)
+![start container](pictures/Docker-Linux-start.png)
 
 ---
 
@@ -124,7 +124,7 @@ add ssh public key
 ------------------
 ~~~
 
-![add ssh key](pictures/Docker-Linux-ssh-copy-id.jpg)
+![add ssh key](pictures/Docker-Linux-ssh-copy-id.png)
 
 ---
 
@@ -133,7 +133,7 @@ login - display sudo privs -- write a file
 ------------------------------------------
 ~~~
 
-![login](pictures/Docker-Linux-login.jpg)
+![login](pictures/Docker-Linux-login.png)
 ---
 
 ---
@@ -143,5 +143,5 @@ verify change in the running container - commit changes
 -------------------------------------------------------
 ~~~
 
-![commit changes](pictures/Docker-Linux-commit-save.jpg)
+![commit changes](pictures/Docker-Linux-commit-save.png)
 

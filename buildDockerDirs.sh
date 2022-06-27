@@ -44,11 +44,11 @@ usage='
 cat >&2 << EOF
 
 Usage: `basename $0` [OPTIONS] -d distribution
-    -d  distribution        # distribution to build
-          debian   - $DEBIAN_BULLSEYE
-          opensuse - $OPENSUSE_LEAP
-          redhat   - $REDHAT_UBI9
-          ubuntu   - $UBUNTU_KINETIC
+    -d  distribution
+          debian        # $DEBIAN_BULLSEYE
+          opensuse      # $OPENSUSE_LEAP
+          redhat        # $REDHAT_UBI9
+          ubuntu        # $UBUNTU_KINETIC
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
@@ -57,8 +57,8 @@ Options:
         password sha can be generated offline: openssl passwd -[156] cleartext
     -o  output              # Docker directory (defaults to distribution name, will not overwrite)
     -t  tag                 # Docker image tagname
-    -vimplugins "bundles"   # download vim pathogen and plugins from github e.g. -vimplugins "kien/ctrlp.vim scrooloose/nerdtree ..."
-    -rustcrates "crates"    # download the Rust compiler and build crates e.g. -rust "bat ripgrep ..."
+    -vimplugins "bundles"   # download vim pathogen and plugins from github e.g. -vimplugins "kien/ctrlp.vim,scrooloose/nerdtree,..."
+    -rustcrates "crates"    # download the Rust compiler and build crates e.g. -rust "bat,ripgrep,..."
 
     -x  execute             # opportunity to execute the docker build on the completed directory
 EOF
@@ -180,6 +180,11 @@ done
 #############################
 ## Perform some sanity checks
 #############################
+if [ ! -z "$*" ]; then
+    echo "${r}Error:${rt} unprocessed arguments:${y}$*${rt}"
+    eval "$usage"
+fi
+
 if [ -z "$docker_image" ]; then
     echo "${r}Error:${rt} ${y}missing -d distribution${rt}"
     eval "$usage"
@@ -197,7 +202,7 @@ fi
 
 # never overwrite build_dir
 if [ -d "$build_dir" ]; then
-    echo "${r}Error:${rt} [$build_dir] already exists"
+    echo "${r}Error:${rt} [${y}$build_dir${rt}] already exists"
     eval "$usage"
 fi
 
@@ -212,15 +217,26 @@ fi
 VIM_PLUGIN_CMD='echo "skipping Vim pathogen bundles"'
 if [ ! -z "$VIM_PLUGINS" ]; then
     VIM_PLUGIN_CMD="mkdir -p /home/\$USER/.vim/autoload /home/\$USER/.vim/bundle && curl -LSso /home/\$USER/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim"
-    for plugin in $VIM_PLUGINS
+
+    OIFS=$IFS
+    IFS=', ' # set space and comma as delimiters
+    read -a plugins <<< "$VIM_PLUGINS"
+    for plugin in "${plugins[@]}"
     do
         VIM_PLUGIN_CMD="$VIM_PLUGIN_CMD && ( cd /home/\$USER/.vim/bundle && rm -rf `basename $plugin` && git clone https://github.com/${plugin}.git )"
     done
+    IFS=$OIFS
+    VIM_PLUGINS=`echo "${plugins[@]}" | sed 's/ /,/g'`
 fi
 
 RUST_CMD='echo "skipping Rust crates"'
 if [ ! -z "$RUST_CRATES" ]; then
-    RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \$HOME/.cargo/bin/cargo install $RUST_CRATES"
+    OIFS=$IFS
+    IFS=', ' # set space and comma as delimiters
+    read -a crates <<< "$RUST_CRATES"
+    IFS=$OIFS
+    RUST_CMD="( curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y ) && \$HOME/.cargo/bin/cargo install ${crates[@]}"
+    RUST_CRATES=`echo "${crates[@]}" | sed 's/ /,/g'`
 fi
 
 ####################################################
@@ -229,13 +245,14 @@ fi
 build_cmd="docker build -t $TAG_NAME $build_dir"
 
 # build a howto for this container
+rerun="$(basename $0) -x -u $USER -n '$USER_NAME' -i $USER_UID -p '$USER_SHA' -r '$ROOT_SHA' -o $build_dir -t $TAG_NAME --vimplugins '$VIM_PLUGINS' --rustcrates '$RUST_CRATES'"
 howto_info=`cat << 'EOM'
 echo "
 ##############################################################################################
 #
 # ${g}calendar: $calendar${rt}
 # ${g}timestamp: $timestamp${rt}
-# ${g}$args${rt}
+# ${g}$rerun${rt}
 #
 # to build the container:
 # ${g}$build_cmd${rt}
