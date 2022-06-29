@@ -22,9 +22,11 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
  
 DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 java locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
+    sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no' /etc/ssh/sshd_config && \
+    sed -i 's/^#X11Forwarding.*/X11UseLocalhost yes' /etc/ssh/sshd_config && \
     mkdir /run/sshd && ssh-keygen -A
     "
 OPENSUSE_INSTALL="zypper refresh && \
@@ -32,10 +34,14 @@ OPENSUSE_INSTALL="zypper refresh && \
     groupadd wheel && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
+    sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no' /etc/ssh/sshd_config && \
+    sed -i 's/^#X11Forwarding.*/X11UseLocalhost yes' /etc/ssh/sshd_config && \
     ssh-keygen -A
     "
-REDHAT_INSTALL="yum -y install $shared_pkg_names glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 && \
+REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 xauth && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
+    sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no' /etc/ssh/sshd_config && \
+    sed -i 's/^#X11Forwarding.*/X11UseLocalhost yes' /etc/ssh/sshd_config && \
     ssh-keygen -A
     "
 UBUNTU_INSTALL="$DEBIAN_INSTALL"
