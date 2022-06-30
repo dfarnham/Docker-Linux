@@ -19,13 +19,13 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='gcc git java jq less make man net-tools perl rsync sudo vim'
+shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
  
 DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 javacc locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
-    sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
+    sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
     mkdir /run/sshd && ssh-keygen -A
     "
 OPENSUSE_INSTALL="zypper refresh && \
