@@ -22,7 +22,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
  
 DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 javacc locales man-db openssh-client openssh-server man-db perl python3 r-base tree && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 javacc locales man-db openssh-client openssh-server man-db perl python3 r-base tree slapd ldap-utils && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
@@ -333,6 +333,7 @@ RUN if [ -x \$HOME/.cargo/bin/cargo ]; then cd /tmp && git clone https://github.
 # switch back to the root user and run sshd
 ###########################################
 USER root
+RUN echo "alias startldap=\"/usr/sbin/slapd -h 'ldap:/// ldapi:///' -g openldap -u openldap -F /etc/ldap/slapd.d\"" >> /root/.bashrc
 WORKDIR /root
 ENTRYPOINT /usr/sbin/sshd && /bin/bash
 EOD

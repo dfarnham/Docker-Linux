@@ -9,7 +9,7 @@ Features:
 
 * Distributions are configured with a sudo account populated from files placed in **user_common**
 * The containers accept **ssh connections**
-* Common tools installed for each distribution (**curl**, **gcc**, **git**, **jq**, **less**, **man**, **openssh**, **perl**, **python3**, **sudo**, **vim**)
+* Common tools installed for each distribution (**curl**, **gcc**, **git**, **java**, **jq**, **less**, **man**, **openssh**, **perl**, **python3**, **sudo**, **vim**)
 * **Vim plugins** can be downloaded from github
 * **Rust crates** can be installed
 * *If Rust is installed so are a few of my Rust tools from github ( **b64**, **num**, **sha**, **utf8char**, **uuid** )*
