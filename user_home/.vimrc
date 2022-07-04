@@ -5,7 +5,9 @@ vnoremap <silent> ## :s/^#//<cr>:noh<cr>
 let g:ctrlp_custom_ignore = 'target/'
 autocmd FileType crontab setlocal backupcopy=yes
 setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-execute pathogen#infect('bundle/{}')
+if !empty(glob("$HOME/.vim/bundle"))
+    execute pathogen#infect('bundle/{}')
+endif
 "execute pathogen#infect()
 
 syntax enable
@@ -86,8 +88,8 @@ map Q :q!
 map W :'a,'bw 
 map ^^ {!}/Users/dafa5923/dev/GitHub/par/par}
 map ^ {!}/Users/dafa5923/dev/GitHub/par/par
-map s :SyntasticToggleMode
-map S :SyntasticCheck
+"map s :SyntasticToggleMode
+"map S :SyntasticCheck
 map <C-n> :noh
 nmap gx <Plug>NetrwBrowseX
 map z z
