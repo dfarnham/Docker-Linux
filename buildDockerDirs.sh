@@ -29,7 +29,7 @@ DEBIAN_INSTALL="apt-get update && \
     mkdir /run/sshd && ssh-keygen -A
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names curl iputils iproute man-pages openssh perl python39 tree xauth && \
+    zypper -n install $shared_pkg_names curl expect iputils iproute man-pages openssh perl python39 tree xauth && \
     groupadd wheel && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
