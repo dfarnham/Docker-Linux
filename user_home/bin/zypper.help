@@ -1,0 +1,67 @@
+#!/usr/bin/sed 1d
+Basic Help:
+    zypper help [command]
+    zypper shell
+    zypper sh
+
+Repository Management:
+    Listing defined repositories
+        zypper repos
+        zypper lr
+
+    Refreshing repositories
+        zypper refresh
+        zypper ref
+
+Package Management:
+    Selecting packages by capability name:
+        zypper in 'perl(Log::Log4perl)'
+        zypper in vim
+
+    Selecting packages by capability name and/or architecture and/or version
+        zypper in 'vim < 8.2'
+        zypper in --name vim
+        zypper in -n vim
+        zypper in -n vim
+
+Installing:
+    Install a single package name
+        zypper install vim
+        zypper in vim
+        zypper in vim=8.2
+
+    Uninstalling
+        zypper remove vim
+        zypper rm vim
+
+    Update package index files:
+        zypper update
+        zypper up
+        zypper up vim
+
+    List installable updates:
+        zypper lu
+
+    Non interactive mode:
+        zypper --non-interactive
+        zypper -n
+
+    No GPG checks
+        zypper --no-gpg-checks
+
+    Auto agree with licenses
+        zypper --auto-agree-with-licenses
+
+Cache:
+    Clean the local caches for all known or specified repositories
+        zypper cc
+
+Search:
+    zypper se vim
+    zypper se 'vi*'
+    zypper se --provides /usr/bin/vim
+    zypper se --provides --match-exact vim
+
+Refresh
+    zypper refresh
+    zypper ref

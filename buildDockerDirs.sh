@@ -22,18 +22,20 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 shared_pkg_names='gcc git jq less make man net-tools perl rsync sudo vim'
  
 DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 javacc locales man-db openssh-client openssh-server man-db perl python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 openjdk-17-jdk locales man-db openssh-client openssh-server man-db perl python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
+    yes | /usr/local/sbin/unminimize && \
     mkdir /run/sshd && ssh-keygen -A
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names curl expect iputils iproute man-pages openssh perl python39 tree xauth && \
+    zypper -n install $shared_pkg_names curl expect java-17-openjdk-devel iputils iproute man-pages openssh perl python39 R-core-packages tree xauth && \
     groupadd wheel && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
+    [ -s /usr/share/vim/vim82/scripts.vim ] && sed -i 's,^call dist#script#DetectFiletype(),\" call dist#script#DetectFiletype(),' /usr/share/vim/vim82/scripts.vim && \
     ssh-keygen -A
     "
 REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 xauth && \
@@ -333,7 +335,7 @@ RUN if [ -x \$HOME/.cargo/bin/cargo ]; then cd /tmp && git clone https://github.
 # switch back to the root user and run sshd
 ###########################################
 USER root
-RUN echo "alias startldap=\"/usr/sbin/slapd -h 'ldap:/// ldapi:/// ldaps:///' -g openldap -u openldap -F /etc/ldap/slapd.d\"" >> /root/.bashrc
+RUN if [ -x /usr/sbin/slapd ]; then echo "alias startldap=\"/usr/sbin/slapd -h 'ldap:/// ldapi:/// ldaps:///' -g openldap -u openldap -F /etc/ldap/slapd.d\"" >> /root/.bashrc; fi
 WORKDIR /root
 ENTRYPOINT /usr/sbin/sshd && /bin/bash
 EOD

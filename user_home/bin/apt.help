@@ -1,0 +1,69 @@
+#!/usr/bin/sed 1d
+Installing:
+    Install a single package name
+        apt-get install vim
+
+    Uninstalling (without removing configuration files):
+        apt-get remove vim
+
+    Uninstalling (removing configuration files):
+        apt-get purge vim
+        apt-get --purge remove vim
+
+    Update package index files:
+        apt-get update
+
+    Update all debian system packages:
+        apt-get upgrade
+
+    Update / Reinstall a single package:
+        apt-get update && apt-get install vim
+
+    Force / Reinstall a single package:
+        apt-get --reinstall install vim
+
+Cache:
+    Clear the APT cache:
+        apt-get clean
+
+    Remove useless files from the APT cache:
+        apt-get autoclean
+
+Search:
+    List all available packages
+        apt-cache pkgnames
+        
+    Searching for a specific debian package
+        apt-cache search "Network Security"
+
+    Show debian package information
+        apt-cache show vim
+
+dpkg:
+    Install a package
+        dpkg -i vim_7.3.429-2ubuntu2_amd64.deb
+        dpkg --install vim_7.3.429-2ubuntu2_amd64.deb
+
+    Remove a package
+        dpkg -r package-name
+        dpkg --remove package-name
+
+    Remove a package along with its corresponding configuration files
+        dpkg --purge package-name
+
+Search:
+    dpkg -l
+    dpkg -l package-name-pattern
+    dpkg -l "re*"
+
+    To list files in a package
+        dpkg -L vim
+
+    To list files in downloaded package
+        dpkg --contents vim_7.3.429-2ubuntu2_amd64.deb
+
+    Show packages containing a filename or filepath
+        dpkg -S /usr/share/man/man5
+
+    Show packages information
+        dpkg -s vim
