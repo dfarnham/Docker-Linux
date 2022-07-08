@@ -26,8 +26,8 @@ DEBIAN_INSTALL="apt-get update && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
-    yes | /usr/local/sbin/unminimize && \
-    mkdir /run/sshd && ssh-keygen -A
+    mkdir /run/sshd && ssh-keygen -A && \
+    if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
     zypper -n install $shared_pkg_names curl expect java-17-openjdk-devel iputils iproute man-pages openssh perl python39 R-core-packages tree xauth && \
@@ -35,8 +35,8 @@ OPENSUSE_INSTALL="zypper refresh && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
-    [ -s /usr/share/vim/vim82/scripts.vim ] && sed -i 's,^call dist#script#DetectFiletype(),\" call dist#script#DetectFiletype(),' /usr/share/vim/vim82/scripts.vim && \
-    ssh-keygen -A
+    ssh-keygen -A && \
+    if [ -s /usr/share/vim/vim82/scripts.vim ]; then sed -i 's,^call dist#script#DetectFiletype(),\" call dist#script#DetectFiletype(),' /usr/share/vim/vim82/scripts.vim; fi
     "
 REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 xauth && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
