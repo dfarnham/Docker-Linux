@@ -119,8 +119,8 @@ alias mv='/bin/mv -i'
 alias rm='/bin/rm -i'
 alias waste='/bin/rm -f'
 alias rot13='perl -pe tr/[a-m][n-z][A-M][N-Z]/[n-z][a-m][N-Z][A-M]/'
-alias grep='/usr/bin/egrep'
-alias cgrep='/usr/bin/egrep --color=always'
+alias grep=egrep
+alias cgrep='egrep --color=always'
 alias ic=imgcat
 alias d='date "+%a %h %d    %D    Time: %r"'
 alias timestamp='date +.%Y%m%d_%H%M%S'
@@ -157,9 +157,6 @@ alias lip='for interface in `ifconfig | egrep "^\w+:" | cut -d: -f1`; do ip=`ipc
 alias vip='perl -MNet::hostent -MSocket -le "chomp(\$h = \`hostname\`); print inet_ntoa(gethost(\$h)->addr)"'
 # quit bash shell without saving history
 alias hclear_exit='unset HISTFILE && exit'
-alias nislab='ssh it-nislab-01.lasp.colorado.edu'
-alias burner='ssh ops-burner.lasp.colorado.edu'
-alias greengw='ssh green-gw1.ops.lasp.colorado.edu'
 alias python=python3
 alias pip=pip3
 alias p1='openssl passwd -1' # Use the MD5 based BSD password algorithm 1
@@ -201,7 +198,7 @@ def() {
 
 psw() {
     if [ $# -gt 0 ]; then
-        ps -ewwf | /usr/bin/egrep -i "$@"
+        ps -ewwf | egrep -i "$@"
     else
         ps -ewwf
     fi
