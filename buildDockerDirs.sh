@@ -30,7 +30,7 @@ DEBIAN_INSTALL="apt-get update && \
     if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names curl expect java-17-openjdk-devel iputils iproute man-pages openssh perl python39 R-core-packages tree xauth && \
+    zypper -n install $shared_pkg_names curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh perl python39 R-core-packages tar tree xauth && \
     groupadd wheel && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
