@@ -22,7 +22,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 shared_pkg_names='automake gcc git jq less make man net-tools perl rsync sshpass sudo vim wget'
  
 DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 openjdk-17-jdk locales man-db openssh-client openssh-server man-db perl python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
+    apt-get -y install $shared_pkg_names curl iputils-ping iproute2 openjdk-17-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
@@ -30,7 +30,7 @@ DEBIAN_INSTALL="apt-get update && \
     if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh perl python39 R-core-packages tar tree xauth && \
+    zypper -n install $shared_pkg_names curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh python39 R-core-packages tar tree xauth && \
     groupadd wheel && \
     ln -s /usr/bin/python3.9 /usr/bin/python3 && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
