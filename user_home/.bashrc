@@ -49,18 +49,6 @@ fi
 
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@`uname -n` ${PWD}\007"'
 if [ "$color_prompt" = yes ]; then
-    # You’ll get the next string:
-    # purple history number \!,
-    # white :,
-    # green ✓ if error code is 0, red ✗ if not,
-    # light green username,
-    # light red symbol @,
-    # light cyan servername,
-    # yellow :,
-    # pink current dir,
-    # '#' if root or '$' if user,
-    # white >
-    #PS1='\[\033[00;35m\]\!\[\033[0m\]: $(if [[ $? == 0 ]]; then echo "\[\033[01;32m\]\342\234\223"; else echo "\[\033[01;31m\]\342\234\227"; fi) \[\033[01;32m\]\u\[\033[01;31m\]@\[\033[01;36m\]\h\[\033[01;33m\]:\[\033[01;35m\]\w\[\033[0m\]\$> '
     PS1='$(if [[ $? == 0 ]]; then echo "\[\033[01;32m\]\342\234\223"; else echo "\[\033[01;31m\]\342\234\227"; fi) \[\033[01;32m\]\u\[\033[01;31m\]@\[\033[01;36m\]\h\[\033[01;33m\]:\[\033[01;35m\]\w\[\033[0m\]\$> '
 else
     PS1='\! \u@\h:\w\$ '
@@ -93,13 +81,15 @@ shopt -s cdspell
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-# tab complete automatically cycle through options
-# bind '"\t":menu-complete'
-bind "TAB:menu-complete"; bind "set show-all-if-ambiguous on"; bind "set menu-complete-display-prefix on"
-bind "set match-hidden-files off"
+# make tab cycle through commands after listing
+bind '"\t":menu-complete'
+bind "set show-all-if-ambiguous on"
+bind "set completion-ignore-case on"
+bind "set menu-complete-display-prefix on"
+#bind "set match-hidden-files off"
 
 if [ -x $HOME/.cargo/bin/bat ]; then
-    alias more=bat --style=plain
+    alias more='bat --style=plain'
 elif [ -x /usr/bin/less ]; then
     alias more=less
 fi
@@ -142,10 +132,6 @@ alias ctest='cargo test --release -- '
 alias redhat='mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared redhat'
 alias suse='mkdir -p /tmp/shared && docker run -p 2223:22 -it -v /tmp/shared:/tmp/shared opensuse'
 alias ubuntu='mkdir -p /tmp/shared && docker run -p 2224:22 -it -v /tmp/shared:/tmp/shared ubuntu'
-#alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
-#alias macdown='/Applications/MacDown.app/Contents/MacOS/MacDown'
-#alias awsls='$HOME/bin/aws-runas kt aws s3 ls --recursive p111-tds-explore-artifacts/ccg_lsa_space/'
-#alias matd='maturin develop --release'
 alias ve='source ~/venv/bin/activate'
 alias da=deactivate
 alias rust='cd ~/dev/Rust'
