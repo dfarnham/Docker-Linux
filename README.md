@@ -12,7 +12,7 @@ Features:
 * Common tools installed for each distribution (**curl**, **gcc**, **git**, **java**, **jq**, **less**, **man**, **openssh**, **perl**, **python3**, **sudo**, **vim**)
 * **Vim plugins** can be downloaded from github
 * **Rust crates** can be installed
-* *If Rust is installed so are a few of my Rust tools from github ( **b64**, **num**, **sha**, **utf8char**, **uuid** )*
+* *If Rust is installed so are a few of my [Rust](https://github.com/dfarnham/Rust) tools from github ( **b64**, **cutr**, **num**, **sha**, **utf8char**, **uuid** )*
 
 ---
 
