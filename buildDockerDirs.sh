@@ -19,7 +19,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='automake gcc git jq less lsof make man net-tools perl rsync sshpass sudo vim wget'
+shared_pkg_names='automake gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget'
  
 DEBIAN_INSTALL="apt-get update && \
     apt-get -y install $shared_pkg_names curl iputils-ping iproute2 openjdk-17-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
