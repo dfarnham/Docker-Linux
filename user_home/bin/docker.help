@@ -1,0 +1,42 @@
+#!/usr/bin/sed 1d
+Listing images:
+	docker images
+
+Listing containers:
+	docker ps -a  # Show all containers (default shows just running)
+	docker ps -l  # Show the latest created container (includes all states)
+	docker container ls
+
+Build a tagged image from the files in specified directory:
+	docker build -t tagname directory_containing_Dockerfile
+
+Running a tagged image
+    docker run -it tagname
+
+    # map local port 2222 to container port 22 and share a directory
+    docker run -p 2222:22 -it -v /tmp/shared_dir:/tmp/shared_dir tagname
+
+Deleting:
+    https://linuxhandbook.com/remove-docker-containers/
+
+    docker rmi image
+      or
+    docker image rm image
+
+    # clean up everything
+    docker system prune
+      or
+    docker system prune -a
+
+    https://www.freecodecamp.org/news/how-to-remove-all-docker-images-a-docker-cleanup-guide/
+    # clean up unused and dangling images
+    docker image prune
+
+    # clean up stoped containers
+    docker container prune
+
+    # clean up unused volumes
+    docker volume prune
+Misc:
+    docker system df
+
