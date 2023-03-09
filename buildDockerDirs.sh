@@ -329,7 +329,7 @@ RUN $VIM_PLUGIN_CMD
 RUN $RUST_CMD
 
 # install personal Rust utilites
-RUN if [ -x \$HOME/.cargo/bin/cargo ]; then cd /tmp && git clone https://github.com/dfarnham/Rust.git && for d in b64 cutr num sha utf8char uuid; do (cd "/tmp/Rust/\$d" && \$HOME/.cargo/bin/cargo install --path .); done; fi
+RUN if [ -x \$HOME/.cargo/bin/cargo ]; then cd /tmp && git clone https://github.com/dfarnham/Rust.git && for d in b64 cutr num sha utf8char uuids; do (cd "/tmp/Rust/\$d" && \$HOME/.cargo/bin/cargo install --path .); done; fi
 
 ###########################################
 # switch back to the root user and run sshd
