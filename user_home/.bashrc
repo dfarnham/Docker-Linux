@@ -23,7 +23,7 @@ esac
 
 # 'interactive' shell test
 #if [[ $- == *i* ]]; then
-if [ -t 0 ]; then
+if [ -t 0 -a "$color_prompt" = yes ]; then
     #== Colors
     # Color    Value     RGB
     # black      0     0, 0, 0
@@ -47,7 +47,7 @@ fi
 # Cyan         0;36     Light Cyan    1;36
 # Light Gray   0;37     White         1;37
 
-PROMPT_COMMAND='echo -ne "\033]0;${USER}@`uname -n` ${PWD}\007"'
+PROMPT_COMMAND='echo -ne "\033]0;${USER}@`uname -n`: ${PWD}\007"'
 if [ "$color_prompt" = yes ]; then
     PS1='$(if [[ $? == 0 ]]; then echo "\[\033[01;32m\]\342\234\223"; else echo "\[\033[01;31m\]\342\234\227"; fi) \[\033[01;32m\]\u\[\033[01;31m\]@\[\033[01;36m\]\h\[\033[01;33m\]:\[\033[01;35m\]\w\[\033[0m\]\$> '
 else
@@ -58,6 +58,10 @@ HISTSIZE=1000
 
 if [ -f $HOME/dev/GitHub/git/contrib/completion/git-completion.bash ]; then
     source $HOME/dev/GitHub/git/contrib/completion/git-completion.bash
+fi
+
+if [ -f $HOME/dev/GitHub/password-store/src/completion/pass.bash-completion ]; then
+    source $HOME/dev/GitHub/password-store/src/completion/pass.bash-completion
 fi
 
 if [ -f $HOME/.maven-completion ]; then
@@ -129,6 +133,7 @@ alias shufflei='perl -MList::Util -lne "print List::Util::shuffle split //"'
 alias cargoi='cargo install --path .'
 alias crun='cargo run --release -- '
 alias ctest='cargo test --release -- '
+alias clip='cargo clippy --release -- '
 alias redhat='mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared redhat'
 alias suse='mkdir -p /tmp/shared && docker run -p 2223:22 -it -v /tmp/shared:/tmp/shared opensuse'
 alias ubuntu='mkdir -p /tmp/shared && docker run -p 2224:22 -it -v /tmp/shared:/tmp/shared ubuntu'
