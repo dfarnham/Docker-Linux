@@ -37,7 +37,7 @@ OPENSUSE_INSTALL="zypper refresh && \
     ssh-keygen -A && \
     if [ -s /usr/share/vim/vim82/scripts.vim ]; then sed -i 's,^call dist#script#DetectFiletype(),\" call dist#script#DetectFiletype(),' /usr/share/vim/vim82/scripts.vim; fi
     "
-REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute man-db openssh-clients openssh-server procps python39 xauth && \
+REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute java-17-openjdk-devel man-db openssh-clients openssh-server procps python39 xauth && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^#X11Forwarding.*/X11UseLocalhost yes/' /etc/ssh/sshd_config && \
