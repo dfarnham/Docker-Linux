@@ -34,7 +34,7 @@ OPENSUSE_INSTALL="zypper refresh && \
     groupadd wheel && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
-    ssh-keygen -A && \
+    ssh-keygen -A
     "
 REDHAT_INSTALL="yum -y install $shared_pkg_names diffutils glibc-langpack-en iputils iproute java-17-openjdk-devel man-db openssh-clients openssh-server procps python39 xauth && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
