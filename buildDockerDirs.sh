@@ -6,10 +6,9 @@
 # current supported distributions by this script
 OPENSUSE_LEAP='opensuse/leap'
 REDHAT_UBI9='redhat/ubi9'
-UBUNTU_KINETIC='ubuntu:latest'
-DEBIAN_BULLSEYE='debian:bullseye'
+UBUNTU_LUNAR='ubuntu:lunar'
 
-DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSEYE]"
+DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 
 ############################################################################
 # Note:
@@ -19,14 +18,14 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_KINETIC] [$DEBIAN_BULLSE
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='automake gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget'
+shared_pkg_names='automake gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
-DEBIAN_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names bind9-dnsutils curl iputils-ping iproute2 openjdk-17-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
+UBUNTU_INSTALL="apt-get update && \
+    apt-get -y install $shared_pkg_names bind9-dnsutils curl iputils-ping iproute2 openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
-    mkdir /run/sshd && ssh-keygen -A && \
+    mkdir -p /run/sshd && ssh-keygen -A && \
     if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
@@ -42,17 +41,14 @@ REDHAT_INSTALL="yum -y install $shared_pkg_names bind-utils diffutils glibc-lang
     sed -i 's/^#X11Forwarding.*/X11UseLocalhost yes/' /etc/ssh/sshd_config && \
     ssh-keygen -A
     "
-UBUNTU_INSTALL="$DEBIAN_INSTALL"
-
 usage='
 cat >&2 << EOF
 
 Usage: `basename $0` [OPTIONS] -d distribution
     -d  distribution
-          debian        # $DEBIAN_BULLSEYE
           opensuse      # $OPENSUSE_LEAP
           redhat        # $REDHAT_UBI9
-          ubuntu        # $UBUNTU_KINETIC
+          ubuntu        # $UBUNTU_LUNAR
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
@@ -125,11 +121,6 @@ do
             shift
             dist_name=$1
             case $1 in
-                debian)
-                    docker_image=$DEBIAN_BULLSEYE
-                    SUDO_GROUP=sudo
-                    INSTALL="$DEBIAN_INSTALL"
-                    ;;
                 opensuse)
                     docker_image=$OPENSUSE_LEAP
                     SUDO_GROUP=wheel
@@ -141,7 +132,7 @@ do
                     INSTALL="$REDHAT_INSTALL"
                     ;;
                 ubuntu)
-                    docker_image=$UBUNTU_KINETIC
+                    docker_image=$UBUNTU_LUNAR
                     SUDO_GROUP=sudo
                     INSTALL="$UBUNTU_INSTALL"
                     ;;

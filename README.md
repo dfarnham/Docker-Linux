@@ -2,7 +2,7 @@
 
 [Latest Version]: https://img.shields.io/badge/Docker_Linux-v0.1.0-blue
 
-### Generates Dockerfiles for Linux distributions **Debian**, **openSUSE**, **RedHat**, **Ubuntu**
+### Generates Dockerfiles for Linux distributions **openSUSE**, **RedHat**, **Ubuntu**
 #### Common tooling with a configured admin account
 
 Features:
@@ -20,7 +20,6 @@ To create the Docker build directories run **buildDockerDirs.sh**:
 
 ~~~sh
 # create the build directory for each distribution with defaults
-buildDockerDirs.sh -d debian
 buildDockerDirs.sh -d opensuse
 buildDockerDirs.sh -d redhat
 buildDockerDirs.sh -d ubuntu
@@ -77,10 +76,9 @@ user_home/
 ~~~sh
 Usage: buildDockerDirs.sh [OPTIONS] -d distribution
     -d  distribution
-          debian        # debian:bullseye
           opensuse      # opensuse/leap
           redhat        # redhat/ubi9
-          ubuntu        # ubuntu:kinetic
+          ubuntu        # ubuntu:lunar
 Options:
     -u  user                # (default derived from the shell)
     -n  name                # (default is "Admin User")
