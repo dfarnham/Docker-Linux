@@ -18,7 +18,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='automake gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
+shared_pkg_names='automake bzip2 gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
 UBUNTU_INSTALL="apt-get update && \
     apt-get -y install $shared_pkg_names bind9-dnsutils curl iputils-ping iproute2 openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
@@ -29,7 +29,7 @@ UBUNTU_INSTALL="apt-get update && \
     if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names bind-utils bzip2 coreutils-doc curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh R-core-packages tar tree vim-data xauth python3 python3-pip && \
+    zypper -n install $shared_pkg_names bind-utils coreutils-doc curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh R-core-packages tar tree vim-data xauth python3 python3-pip && \
     groupadd wheel && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
