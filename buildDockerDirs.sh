@@ -18,10 +18,10 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='automake bzip2 gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
+shared_pkg_names='automake bzip2 file gawk gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
 UBUNTU_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names bind9-dnsutils curl iputils-ping iproute2 openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
+    apt-get -y install $shared_pkg_names bind9-dnsutils build-essential curl iputils-ping iproute2 libasound2-dev libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip r-base tree expect slapd ldap-utils gnutls-bin ssl-cert && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
