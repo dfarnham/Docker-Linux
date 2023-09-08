@@ -20,7 +20,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
 shared_pkg_names='automake bzip2 file gawk gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
-UBUNTU_INSTALL="apt update && DEBIAN_FRONTEND=noninteractive && \
+UBUNTU_INSTALL="DEBIAN_FRONTEND=noninteractive apt update && \
     apt -y install $shared_pkg_names bind9-dnsutils build-essential curl iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
