@@ -20,8 +20,8 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
 shared_pkg_names='automake bzip2 file gawk gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
-UBUNTU_INSTALL="apt-get update && \
-    apt-get -y install $shared_pkg_names bind9-dnsutils build-essential curl iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps && \
+UBUNTU_INSTALL="apt update && DEBIAN_FRONTEND=noninteractive && \
+    apt -y install $shared_pkg_names bind9-dnsutils build-essential curl iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
@@ -281,16 +281,14 @@ cat > $build_dir/Dockerfile << EOD
 FROM $docker_image
 $howto_comment
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 # the admin user
-ENV USER='$USER'
-ENV USER_NAME='$USER_NAME'
-ENV USER_UID=$USER_UID
-ENV USER_SHA='$USER_SHA'
+ARG USER='$USER'
+ARG USER_NAME='$USER_NAME'
+ARG USER_UID=$USER_UID
+ARG USER_SHA='$USER_SHA'
 
 # configure this box with a root password by modifying /etc/shadow with sed
-ENV ROOT_SHA='$ROOT_SHA'
+ARG ROOT_SHA='$ROOT_SHA'
 RUN sed -i "s,root:[^:]*:,root:\$ROOT_SHA:," /etc/shadow
 
 # install packages, setup sudo, locale, system ssh host keys
