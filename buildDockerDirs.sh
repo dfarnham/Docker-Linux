@@ -21,7 +21,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 shared_pkg_names='automake bzip2 file gawk gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
 UBUNTU_INSTALL="DEBIAN_FRONTEND=noninteractive apt update && \
-    apt -y install $shared_pkg_names bind9-dnsutils build-essential curl iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps && \
+    apt -y install $shared_pkg_names bind9-dnsutils bison build-essential curl flex iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps zsh && \
     sed -i 's,%sudo.*,%sudo ALL=(ALL:ALL) NOPASSWD: ALL,' /etc/sudoers && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's/^# en_US/en_US/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales && \
@@ -29,7 +29,7 @@ UBUNTU_INSTALL="DEBIAN_FRONTEND=noninteractive apt update && \
     if [ -x /usr/local/sbin/unminimize ]; then yes | /usr/local/sbin/unminimize; fi
     "
 OPENSUSE_INSTALL="zypper refresh && \
-    zypper -n install $shared_pkg_names bind-utils coreutils-doc curl gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh R-core-packages tar tree vim-data xauth python3 python3-pip && \
+    zypper -n install $shared_pkg_names bind-utils bison coreutils-doc curl flex gnutls expect java-17-openjdk-devel iputils iproute man-pages openssh R-core-packages tar tree vim-data xauth python3 python3-pip && \
     groupadd wheel && \
     sed -i 's/^#X11UseLocalhost.*/X11UseLocalhost no/' /etc/ssh/sshd_config && \
     sed -i 's,# %wheel,%wheel,' /etc/sudoers && \
