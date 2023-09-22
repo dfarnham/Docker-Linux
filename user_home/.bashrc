@@ -64,6 +64,10 @@ if [ -f $HOME/dev/GitHub/password-store/src/completion/pass.bash-completion ]; t
     source $HOME/dev/GitHub/password-store/src/completion/pass.bash-completion
 fi
 
+if [ -f $HOME/.just-completions-bash ]; then
+    source $HOME/.just-completions-bash
+fi
+
 if [ -f $HOME/.maven-completion ]; then
     source $HOME/.maven-completion
 fi
