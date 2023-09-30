@@ -18,7 +18,7 @@ DISTRIBUTIONS="[$OPENSUSE_LEAP] [$REDHAT_UBI9] [$UBUNTU_LUNAR]"
 
 # specific to each distribution: sudo, locale, system ssh host keys,
 # package specific names (e.g. openssh vs openssh-clients + openssh-server)
-shared_pkg_names='automake bzip2 file gawk gcc git jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
+shared_pkg_names='automake bzip2 file gawk gcc git gzip jq less lsof make man net-tools nmap perl rsync sshpass sudo vim wget zip unzip'
  
 UBUNTU_INSTALL="DEBIAN_FRONTEND=noninteractive apt update && \
     apt -y install $shared_pkg_names bind9-dnsutils bison build-essential curl flex iputils-ping iproute2 libasound2-dev libopengl0 libpcap-dev openjdk-21-jdk locales man-db openssh-client openssh-server python3 python3-pip python3-venv r-base tree expect slapd ldap-utils gnutls-bin ssl-cert x11-apps zsh && \
@@ -256,7 +256,7 @@ echo "
 # ${g}$build_cmd${rt}
 
 # to run the container exposing a shared directory and mapping localhost port 2222 to 22
-# ${g}mkdir -p /tmp/shared && docker run -p 2222:22 -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}
+# ${g}mkdir -p /tmp/shared && docker run -p 2222:22 --rm -it -v /tmp/shared:/tmp/shared $TAG_NAME${rt}
 
 # to connect to the running container as ${y}admin $USER${rt}
 # ${g}ssh -p 2222 $USER@localhost${rt}
